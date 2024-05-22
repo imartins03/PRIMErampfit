@@ -54,7 +54,7 @@ def get_ramp_cds(file_list,superbias, calFile,multiThread:bool=True, externalPix
     fits.writeto('cds_file', cds, overwrite=True)
 
 print(outfile)
-
+#%%
 print(irrc_correct_frame(image1,superbias,calFile))
 
 
