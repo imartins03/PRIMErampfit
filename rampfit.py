@@ -188,3 +188,14 @@ def corrected_files(frame_list,superbias, calFile,multiThread=True, externalPixe
 
 print(corrected_files(full_file_list,supercpy,calFile))
 
+P = 0  # Starting index for the loop
+D = ds[P]  # Initial value from ds
+
+for P in range(len(M)):
+    D = ds[P]
+    # Here, M[P] would be the equivalent of accessing the current element in M
+    if P >= len(M):  # Equivalent to the condition P != Q
+        break
+    # Loop body logic goes here
+
+
