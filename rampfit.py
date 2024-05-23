@@ -151,51 +151,45 @@ print(process_files(full_file_list,supercpy,calFile))
 #%%
 
 def get_ramp_slope(frame_list,superbias, calFile, mask):
-    slopes = []
+    # slopes = []
     corrected_images = []
+    y=[]
     for frame in frame_list:
         out_img = irrc_correct_frame_file(frame,superbias,calFile)
-        y = out_img.flatten()  # ask if this works
-        x = np.arange(len(y))  #???
-        coefficients = np.polyfit(x,y,1)
-        slope = coefficients[0]   #the slope is just the coefficient of the first degree term (y=mx+b)
-        slopes.append(slope)   #adding the slopes to the list
+        y.append(out_img)
+    x = np.arange(len(y))  #???
+    y = np.asarray(y)
+    y = y.reshape((x.shape[0],-1))
+    coefficients = np.polyfit(x,y,1)
+    slope = coefficients[0]   #the slope is just the coefficient of the first degree term (y=mx+b)
+    # slopes.append(slope)   #adding the slopes to the list
 
-        #To create a linear fit line, polyval evaluates specific values for coefficients, polyfit fits and return the actual coefficients
-        fit = np.polyval(coefficients,x)
-        fit_image = fit.reshape(out_img.shape)  #tried to fit it back to the image here (instead of flattened)
+    # #To create a linear fit line, polyval evaluates specific values for coefficients, polyfit fits and return the actual coefficients
+    # fit = np.polyval(coefficients,x)
+    fit_image = slope.reshape(out_img.shape)  #tried to fit it back to the image here (instead of flattened)
 
-
-        #THIS IS WRONG
-        cor_img = slopes/out_img
-        corrected_images.append(cor_img)
-
-        return slopes,corrected_images
+    # corrected_images.append(cor_img)
+    fits.writeto('slope_img', fit_image,overwrite=True)
+    return slopes,corrected_images
 
 slopes,corrected_images = get_ramp_slope(full_file_list,supercpy,calFile,mask)
-print(f'slopes={slopes},cor_imgs={corrected_images}')
+# print(f'slopes={fit_image},cor_imgs={corrected_images}')
+
 #%%
 
-#NEED TO MAKE SURE ALL IMAGES DOWNLOAD AND NOT JUST ONE
-def corrected_files(frame_list,superbias, calFile,multiThread=True, externalPixelFlags:np.ndarray=None):
-    slopes, corrected_images = get_ramp_slope(frame_list, superbias, calFile, mask)
-    for frame,cor_img in zip(frame_list,corrected_images):
-        print('number processing:',frame)
-        
-        # img = get_ramp_slope(frame_list,superbias, calFile, mask)
-        output = frame + ".cor.fits"
-        fits.writeto(output, cor_img, overwrite=True)
+# #NEED TO MAKE SURE ALL IMAGES DOWNLOAD AND NOT JUST ONE
+# def corrected_files(frame_list,superbias, calFile,multiThread=True, externalPixelFlags:np.ndarray=None):
+#     slopes, corrected_images = get_ramp_slope(frame_list, superbias, calFile, mask)
+#     for frame,cor_img in zip(frame_list,corrected_images):
+#         print('number processing:',frame)
+#
+#         # img = get_ramp_slope(frame_list,superbias, calFile, mask)
+#         output = frame + ".cor.fits"
+#         fits.writeto(output, cor_img, overwrite=True)
+#
+# print(corrected_files(full_file_list,supercpy,calFile))
 
-print(corrected_files(full_file_list,supercpy,calFile))
+#%%
 
-P = 0  # Starting index for the loop
-D = ds[P]  # Initial value from ds
-
-for P in range(len(M)):
-    D = ds[P]
-    # Here, M[P] would be the equivalent of accessing the current element in M
-    if P >= len(M):  # Equivalent to the condition P != Q
-        break
-    # Loop body logic goes here
 
 
