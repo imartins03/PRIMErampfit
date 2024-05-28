@@ -1,0 +1,137 @@
+# -*- coding: utf-8 -*-
+#file_name.py
+#python 5.4.3
+
+"""
+Created on Mon May 27 22:21:29 2024
+Modified on Mon May 27 22:21:29 2024
+
+@author: Isabela Martins
+"""
+
+# -*- coding: utf-8 -*-
+#file_name.py
+#python 5.4.3
+
+"""
+Created on Sun May 26 12:26:50 2024
+Modified on Sun May 26 12:26:50 2024
+
+@author: Isabela Martins
+"""
+
+import numpy as np
+from astropy.io import fits
+
+# Constants
+cutoff_gain = 5
+err_threshold = 1125
+full_well = 65535   #full-well (saturation) cutoff
+detector_gain = 2
+num_pixels = 524288 #Num Dat 128*4096 for an output
+
+# open the two images
+filenames = []  #add file names
+num_samples = len(filenames)
+
+def read_fits_data(filenames, num_samples):
+    data_samples = []
+    for f in filenames:   #f being a filename
+        with fits.open(f) as hdul:
+            data_samples.append(hdul[0].data.reshape())
+    return np.array(data_samples)
+
+data = read_fits_data(filenames, num_samples)
+
+#%%
+
+def integrate(num_samples, sample_data, signal_out, variance_out):
+    num_pixels = sample_data.shape[1]
+    external_memory = np.zeros(num_pixels, dtype=[
+        ('weight', 'f4'), 
+        ('cumulative_signal', 'f4'), 
+        ('cumulative_total', 'f4'), 
+        ('recent_sample', 'f4'), 
+        ('sum_diff', 'f4'), 
+        ('good_samples', 'i4'), 
+        ('good_intervals', 'i4')
+    ])
+
+    # Initialize external memory
+    for mem_entry in external_memory:
+        mem_entry['cumulative_total'] = mem_entry['recent_sample'] = sample_data[0, 0]
+        mem_entry['cumulative_signal'] = mem_entry['weight'] = mem_entry['sum_diff'] = 0
+        mem_entry['good_intervals'] = mem_entry['good_samples'] = 0
+
+    # Process each sample
+    for i in range(num_samples):
+        for mem_entry in external_memory:
+            if sample_data[i, 0] < full_well:
+                next_sample = sample_data[i, 0]
+                diff = next_sample - mem_entry['recent_sample']
+                avg_signal = mem_entry['cumulative_signal'] / (mem_entry['weight'] if mem_entry['weight'] else 1)
+                error = diff - avg_signal
+                good_samples_count = mem_entry['good_samples']
+                good_intervals_count = mem_entry['good_intervals']
+
+                if error * error < cutoff_gain * avg_signal + err_threshold:
+                    good_samples_count += 1
+                    good_intervals_count += 1
+                    mem_entry['sum_diff'] += diff
+                    mem_entry['weight'] += good_samples_count * (good_samples_count + 1) / 2.0
+                    mem_entry['cumulative_signal'] += good_samples_count * next_sample - mem_entry['cumulative_total']
+                    mem_entry['recent_sample'] = next_sample
+                    mem_entry['cumulative_total'] += next_sample
+                else:
+                    if good_intervals_count <= 1:
+                        mem_entry['weight'] = 1
+                        mem_entry['cumulative_signal'] = diff
+                        good_intervals_count = 1
+                        good_samples_count = 1
+                        mem_entry['sum_diff'] = diff
+                        mem_entry['cumulative_total'] = next_sample + mem_entry['recent_sample']
+                        mem_entry['recent_sample'] = next_sample
+                    else:
+                        good_samples_count = 0
+                        mem_entry['recent_sample'] = next_sample
+                        mem_entry['cumulative_total'] = next_sample
+                
+                mem_entry['good_samples'] = good_samples_count
+                mem_entry['good_intervals'] = good_intervals_count
+            else:
+                mem_entry['good_samples'] = 0
+                mem_entry['recent_sample'] = sample_data[i, 0]
+                mem_entry['cumulative_total'] = mem_entry['recent_sample']
+    
+    # Calculate signal and variance estimates
+    for mem_entry in external_memory:
+        weight = mem_entry['weight'] if mem_entry['weight'] else 1
+        signal_out.append(mem_entry['cumulative_signal'] * (4 * err_threshold + mem_entry['sum_diff']) / (mem_entry['good_intervals'] * mem_entry['cumulative_signal'] + 4 * weight * err_threshold))
+        variance_out.append(err_threshold / (weight * detector_gain) + signal_out[-1] / (mem_entry['good_intervals'] * detector_gain))
+
+
+def main(input_files, output_file):
+    num_samples = len(input_files)
+    sample_data = read_fits_data(input_files, num_samples)
+    signal_out = []
+    variance_out = []
+
+    integrate(num_samples, sample_data, signal_out, variance_out)
+
+    with fits.open(input_files[0]) as hdul:
+        hdul[0].data = np.array(signal_out).reshape(hdul[0].data.shape)
+        hdul.writeto(output_file, overwrite=True)
+
+#how i would use it
+input_files = ['sample1.fits', 'sample2.fits', 'sample3.fits']
+output_file = 'output_ramp.fits'
+main(input_files, output_file)
+
+
+
+
+
+
+
+
+
