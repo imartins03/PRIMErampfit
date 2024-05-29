@@ -1,0 +1,13 @@
+This directory was created to demonstrate the use of Improved Roman Reference Pixel Correction for reference pixel correction.
+
+This directory contains:
+-3 raw frames as test images for a single detector, C1.
+-A textfile listing these 3 test frames.
+-A directory IRRC_calfiles containing the IRRC weights used in the correction and bad reference pixel masks for each detector, C1-4.
+-A script to IRRC correct these images.
+
+To run the script, use teh following syntax:
+python example_irrc.py [text file list of frames] [detector] [directory with IRRC weights and bad reference pixel masks]
+
+For example,
+python example_irrc.py frame_list.txt C1 ./IRRC_calfiles

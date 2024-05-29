@@ -27,12 +27,16 @@ fits.writeto('subtracted1_image.fits',im_new,overwrite=True)
 print(outfile)
 #%%
 
-image1 = fits.getdata(r'D:\NLC\C1\01124973C1_ircc.fits')
-image2 = fits.getdata(r'D:\NLC\C1\01124972C1_ircc.fits')
-image3 = fits.getdata(r'D:\NLC\C1\01124974C1_ircc.fits')
-image4 = fits.getdata(r'D:\NLC\C1\01124975C1_ircc.fits')
-
-frame_list = [image1,image2,image3,image4]
+# image1 = fits.getdata(r'D:\NLC\C1\01124973C1_ircc.fits')
+# image2 = fits.getdata(r'D:\NLC\C1\01124972C1_ircc.fits')
+# image3 = fits.getdata(r'D:\NLC\C1\01124974C1_ircc.fits')
+# image4 = fits.getdata(r'D:\NLC\C1\01124975C1_ircc.fits')
+#
+# frame_list = [image1,image2,image3,image4]
+file_format = r'D:\NLC\C1\{0:08d}C1_ircc.fits'
+r = (1124972, 1125497)
+# r = (1124972, 1124972+100)
+frame_list = np.asarray([fits.getdata(file_format.format(n)) for n in range(*r)])
 super_bias = fits.getdata('C:\\PycharmProjects\\PRIMErampfit\\IRRC_calfiles\\super_biasC1.fits.ramp.20231012')
 calFile = r'C:\PycharmProjects\PRIMErampfit\IRRC_calfiles\irrc_weights_C1.h5'
 
@@ -151,7 +155,7 @@ print(process_files(full_file_list,supercpy,calFile))
 #%%
 
 def get_ramp_slope(frame_list,superbias, calFile, mask):
-    # slopes = []
+    slopes = []
     corrected_images = []
     y=[]
     for frame in frame_list:
