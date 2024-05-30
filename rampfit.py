@@ -29,7 +29,7 @@ print(outfile)
 
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
 # r = (1124972, 1125497)
-r = (1124972, 1124972+5)
+r = (1124972, 1124972+9)
 file_list = [file_format.format(n) for n in range(*r)]
 full_file_list = file_list
 print(file_list)
@@ -41,21 +41,6 @@ mask = maskFile>0
 
 supercpy = super_bias.copy()
 supercpy[mask[:,:4096]] = 0
-
-
-# img_cube_list = []
-# hdr_list = []
-# for f in frame_list:
-#     hdu = fits.open(f)
-#     d = hdu[image_hdu].data[:, 6:]  # Assumes data is in 1st HDU of FITS and headers are present
-#     h = hdu[image_hdu].header
-#     hdr_list.append(h)
-#     # Mask bad reference pixels
-#     dcpy = d.copy()
-#     dcpy[mask] = 0
-#     img_cube_list.append(dcpy)
-# dataIn = np.asarray(img_cube_list)
-
 
 def irrc_correct_frame(
         dataIn, superbias, calFile, multiThread:bool=True, externalPixelFlags:np.ndarray=None,
@@ -98,12 +83,9 @@ def get_ramp_cds(frame_list,superbias, calFile,multiThread=True, externalPixelFl
 # print(get_ramp_cds(file_list,supercpy,calFile,superbias_corrected=True))
 #get_ramp_cds(file_list,supercpy,calFile)
 
-
 # corrected_frame = irrc_correct_frame(dataIn, superbias, calFile)
 # fits.writeto('corrected_frame_image1.fits', corrected_frame[0], overwrite=True)
-
 #%%
-
 def process_files(frame_list,superbias, calFile,multiThread=True, externalPixelFlags:np.ndarray=None):
     for frame in frame_list:
         # frame = full_file_list[i]
@@ -118,10 +100,8 @@ def process_files(frame_list,superbias, calFile,multiThread=True, externalPixelF
 
 # print(frame_list)
 # print(process_files(full_file_list,supercpy,calFile))
-
 #%%
-
-def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088)),degrees=8):  # ((y1,y2), (x1,x2))
+def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088)),degrees=5):  # ((y1,y2), (x1,x2))
     slopes = []
     corrected_images = []
     y=[]
@@ -155,12 +135,12 @@ def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088))
             coeff_images.append(coeff_image)
 
     coeff_images = np.stack(coeff_images,axis=0)
-    fits.writeto(frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits'), coeff_images, overwrite=True)
+    fits.writeto(frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits'), coeff_images, overwrite=True)  ##
     # fits.writeto(frame_list[0].replace('.fits.fz', '.ramp.fits'), fit_image,overwrite=True)
     return coeff_images
 
 print('get_ramp_slope')
-coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=8)
+coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=5)
 
 
 # slopes,corrected_images = get_ramp_slope(full_file_list,supercpy,calFile,mask)
