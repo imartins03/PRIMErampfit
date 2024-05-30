@@ -27,15 +27,9 @@ fits.writeto('subtracted1_image.fits',im_new,overwrite=True)
 print(outfile)
 #%%
 
-# image1 = fits.getdata(r'D:\NLC\C1\01124973C1_ircc.fits')
-# image2 = fits.getdata(r'D:\NLC\C1\01124972C1_ircc.fits')
-# image3 = fits.getdata(r'D:\NLC\C1\01124974C1_ircc.fits')
-# image4 = fits.getdata(r'D:\NLC\C1\01124975C1_ircc.fits')
-#
-# frame_list = [image1,image2,image3,image4]
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
 # r = (1124972, 1125497)
-r = (1124972, 1124972+10)
+r = (1124972, 1124972+5)
 file_list = [file_format.format(n) for n in range(*r)]
 full_file_list = file_list
 print(file_list)
@@ -47,7 +41,6 @@ mask = maskFile>0
 
 supercpy = super_bias.copy()
 supercpy[mask[:,:4096]] = 0
-
 
 
 # img_cube_list = []
@@ -93,9 +86,6 @@ def irrc_correct_frame_file(filename,superbias, calFile,multiThread:bool=True, e
 plt.show()
 print(irrc_correct_frame_file(r'D:\NLC\C1\01124973C1.fits.fz',supercpy,calFile))
 #%%
-# file_list = [r'D:\NLC\C1\01124972C1.fits.fz',r'D:\NLC\C1\01124973C1.fits.fz']
-#,r'D:\NLC\C1\01124974C1.fits.fz',r'D:\NLC\C1\01124975C1.fits.fz']
-
 def get_ramp_cds(frame_list,superbias, calFile,multiThread=True, externalPixelFlags:np.ndarray=None,
                  superbias_corrected:bool=True):
     image1 = irrc_correct_frame_file(frame_list[0], superbias, calFile, multiThread, externalPixelFlags, superbias_corrected)
@@ -114,31 +104,6 @@ def get_ramp_cds(frame_list,superbias, calFile,multiThread=True, externalPixelFl
 
 #%%
 
-#Number of bits in the ADC
-#p = 8
-
-#z is the max number of samples
-#z = 1894
-#q = math.log2(z)
-
-#make a new function but ramp reduced
-#same inputs and write a file at the end, but instead of subtraction between teo frames do a linear fit of the frames, use linear regression numpy function
-
-#make a loop to call out/generate images, create a linear fit, and then use np.poly fit (with the 1 so its a 1 degreee polynomial) to create fit)
-
-# full_file_list = [r'D:\NLC\C1\01124972C1.fits.fz',r'D:\NLC\C1\01124973C1.fits.fz',r'D:\NLC\C1\01124974C1.fits.fz',r'D:\NLC\C1\01124975C1.fits.fz']
-
-# def process_files(frame_list,superbias, calFile,multiThread=True, externalPixelFlags:np.ndarray=None):
-#     for i in range(len(full_file_list)):
-#         frame = full_file_list[i]
-#
-#         output_file = frame
-#
-#         cor_img = irrc_correct_frame_file(output_file,superbias,calFile,mask)
-#         outpt = frame + ".cor.fits"
-#         fits.writeto(outpt,cor_img,overwrite=True)
-#         print(f'The output is saved to {outpt}')
-
 def process_files(frame_list,superbias, calFile,multiThread=True, externalPixelFlags:np.ndarray=None):
     for frame in frame_list:
         # frame = full_file_list[i]
@@ -156,7 +121,7 @@ def process_files(frame_list,superbias, calFile,multiThread=True, externalPixelF
 
 #%%
 
-def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088))):  # ((y1,y2), (x1,x2))
+def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088)),degrees=8):  # ((y1,y2), (x1,x2))
     slopes = []
     corrected_images = []
     y=[]
@@ -171,36 +136,51 @@ def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088))
     x = np.arange(len(y))  #???
     y = np.asarray(y)
     y = y.reshape((x.shape[0],-1))
-    coefficients = np.polyfit(x,y,2)
-    slope = coefficients[0]   #the slope is just the coefficient of the first degree term (y=mx+b)
+
+    # coefficients = np.polyfit(x,y,2)
+    #slope = coefficients[0]   #the slope is just the coefficient of the first degree term (y=mx+b)
     # slopes.append(slope)   #adding the slopes to the list
 
     # #To create a linear fit line, polyval evaluates specific values for coefficients, polyfit fits and return the actual coefficients
     # fit = np.polyval(coefficients,x)
-    fit_image = slope.reshape(out_img.shape)  #tried to fit it back to the image here (instead of flattened)
-    print(fit_image)
+    # fit_image = slope.reshape(out_img.shape)  #tried to fit it back to the image here (instead of flattened)
+    # print(fit_image)
     # corrected_images.append(cor_img)
-    fits.writeto(frame_list[0].replace('.fits.fz', '.ramp.fits'), fit_image,overwrite=True)
-    return slopes,corrected_images
+
+    coeff_images = []
+    for degree in range(1, degrees+1):
+        coefficients = np.polyfit(x,y,degree)
+        for coeff in coefficients:
+            coeff_image = coeff.reshape(out_img.shape)
+            coeff_images.append(coeff_image)
+
+    coeff_images = np.stack(coeff_images,axis=0)
+    fits.writeto(frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits'), coeff_images, overwrite=True)
+    # fits.writeto(frame_list[0].replace('.fits.fz', '.ramp.fits'), fit_image,overwrite=True)
+    return coeff_images
+
 print('get_ramp_slope')
-slopes,corrected_images = get_ramp_slope(full_file_list,supercpy,calFile,mask)
+coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=8)
+
+
+# slopes,corrected_images = get_ramp_slope(full_file_list,supercpy,calFile,mask)
 # print(f'slopes={fit_image},cor_imgs={corrected_images}')
 
 #%%
 
-# #NEED TO MAKE SURE ALL IMAGES DOWNLOAD AND NOT JUST ONE
-# def corrected_files(frame_list,superbias, calFile,multiThread=True, externalPixelFlags:np.ndarray=None):
-#     slopes, corrected_images = get_ramp_slope(frame_list, superbias, calFile, mask)
-#     for frame,cor_img in zip(frame_list,corrected_images):
-#         print('number processing:',frame)
-#
-#         # img = get_ramp_slope(frame_list,superbias, calFile, mask)
-#         output = frame + ".cor.fits"
-#         fits.writeto(output, cor_img, overwrite=True)
-#
-# print(corrected_files(full_file_list,supercpy,calFile))
+# img_cube_list = []
+# hdr_list = []
+# for f in frame_list:
+#     hdu = fits.open(f)
+#     d = hdu[image_hdu].data[:, 6:]  # Assumes data is in 1st HDU of FITS and headers are present
+#     h = hdu[image_hdu].header
+#     hdr_list.append(h)
+#     # Mask bad reference pixels
+#     dcpy = d.copy()
+#     dcpy[mask] = 0
+#     img_cube_list.append(dcpy)
+# dataIn = np.asarray(img_cube_list)
 
-#%%
 
 
 
