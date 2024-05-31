@@ -153,8 +153,6 @@ print('get_ramp_slope')
 coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=1)
 
 
-
-
 image1 = fits.getdata(r'D:\NLC\C1\01124973C1_ircc.fits')
 image2 = fits.getdata(r'D:\NLC\C1\01124972C1_ircc.fits')
 
