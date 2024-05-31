@@ -80,12 +80,6 @@ def get_ramp_cds(frame_list,superbias, calFile,multiThread=True, externalPixelFl
     f = frame_list[0]+".cds.fits"
     fits.writeto(f, cds, overwrite=True)
     return f
-
-# print(get_ramp_cds(file_list,supercpy,calFile,superbias_corrected=True))
-#get_ramp_cds(file_list,supercpy,calFile)
-
-# corrected_frame = irrc_correct_frame(dataIn, superbias, calFile)
-# fits.writeto('corrected_frame_image1.fits', corrected_frame[0], overwrite=True)
 #%%
 def process_files(frame_list,superbias, calFile,multiThread=True, externalPixelFlags:np.ndarray=None):
     for frame in frame_list:
@@ -97,10 +91,6 @@ def process_files(frame_list,superbias, calFile,multiThread=True, externalPixelF
         out_img = irrc_correct_frame_file(frame,superbias,calFile, multiThread, externalPixelFlags)
         outpt = frame + ".out.fits"
         fits.writeto(outpt,out_img,overwrite=True)
-        # print(f'The output is saved to {outpt}')
-
-# print(frame_list)
-# print(process_files(full_file_list,supercpy,calFile))
 
 def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088)),degrees=4):  # ((y1,y2), (x1,x2))
     slopes = []
@@ -114,6 +104,7 @@ def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088))
             out_img = out_img[:, slc[0][0]:slc[0][1], slc[1][0]:slc[1][1]]
             print(out_img.shape)
 
+    #ISSUE HERE
     saturation_mask = out_img > 20000
     out_img[saturation_mask] = np.nan
 
@@ -122,20 +113,13 @@ def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088))
     y = np.asarray(y)
     y = y.reshape((x.shape[0],-1))
 
-    # coefficients = np.polyfit(x,y,2)
     # slope = coefficients[0]   #the slope is just the coefficient of the first degree term (y=mx+b)
-    # slopes.append(slope)   #adding the slopes to the list
-    #
-    # #To create a linear fit line, polyval evaluates specific values for coefficients, polyfit fits and return the actual coefficients
-    # fit = np.polyval(coefficients,x)
-    # fit_image = slope.reshape(out_img.shape)  #tried to fit it back to the image here (instead of flattened)
-    # print(fit_image)
-    # corrected_images.append(cor_img)
 
     coeff_images = []
     cov_matrices = []
     coefficients, cov_mat = np.polyfit(x, y, degrees,cov=True)
 
+    #ISSUE HERE WITH THE COVARIANCE
     for coeff in coefficients:
         coeff_image = coeff.reshape(out_img.shape)
         coeff_images.append(coeff_image)
@@ -153,14 +137,8 @@ def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088))
 
     return coeff_images, cov_matrices
 
-print('slc')
-
-
 print('get_ramp_slope')
 coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=1)
-
-# slopes,corrected_images = get_ramp_slope(full_file_list,supercpy,calFile,mask)
-# print(f'slopes={fit_image},cor_imgs={corrected_images}')
 
 
 
