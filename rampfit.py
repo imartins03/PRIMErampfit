@@ -11,6 +11,7 @@ import numpy as np
 from irrc.apply_correction import _load_coeffs_from_file, apply_in_memory
 from irrc.util import destripe
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 
@@ -28,10 +29,11 @@ print(outfile)
 
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
 # r = (1124972, 1125497)
-r = (1124972, 1124972+9)
+r = (1124972, 1124972+4)
+
 file_list = [file_format.format(n) for n in range(*r)]
 full_file_list = file_list
-print(file_list)
+print(len(file_list))
 
 super_bias = fits.getdata('C:\\PycharmProjects\\PRIMErampfit\\IRRC_calfiles\\super_biasC1.fits.ramp.20231012')
 calFile = r'C:\PycharmProjects\PRIMErampfit\IRRC_calfiles\irrc_weights_C1.h5'
@@ -100,7 +102,7 @@ def process_files(frame_list,superbias, calFile,multiThread=True, externalPixelF
 # print(frame_list)
 # print(process_files(full_file_list,supercpy,calFile))
 
-def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088)),degrees=5):  # ((y1,y2), (x1,x2))
+def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088)),degrees=4):  # ((y1,y2), (x1,x2))
     slopes = []
     corrected_images = []
     y=[]
@@ -111,7 +113,11 @@ def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088))
             print(out_img.shape)
             out_img = out_img[:, slc[0][0]:slc[0][1], slc[1][0]:slc[1][1]]
             print(out_img.shape)
-        y.append(out_img)
+
+    saturation_mask = out_img > 20000
+    out_img[saturation_mask] = np.nan
+
+    y.append(out_img)
     x = np.arange(len(y))  #???
     y = np.asarray(y)
     y = y.reshape((x.shape[0],-1))
@@ -127,87 +133,34 @@ def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088))
     # corrected_images.append(cor_img)
 
     coeff_images = []
-    for degree in range(1, degrees+1):
-        coefficients = np.polyfit(x,y,degrees)
-        for coeff in coefficients:
-            coeff_image = coeff.reshape(out_img.shape)
-            coeff_images.append(coeff_image)
+    cov_matrices = []
+    coefficients, cov_mat = np.polyfit(x, y, degrees,cov=True)
 
+    for coeff in coefficients:
+        coeff_image = coeff.reshape(out_img.shape)
+        coeff_images.append(coeff_image)
+        cov_mat_img = coeff.reshape(out_img.shape)
+        cov_matrices.append(cov_mat_img)
 
     coeff_images = np.stack(coeff_images,axis=0)
-    fits.writeto(frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits'), coeff_images, overwrite=True)  ##
+    cov_matrices = np.stack(cov_matrices,axis=0)
+    # hdu = fits.ImageHDU(coeff_images)
+    fits.HDUList([fits.PrimaryHDU(coeff_images)]).writeto(frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits'), overwrite=True)
+    fits.HDUList([fits.PrimaryHDU(cov_matrices)]).writeto(frame_list[0].replace('.fits.fz', f'.pcov_cb_{degrees}deg.fits'), overwrite=True)
+
+    # fits.writeto(frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits'), coeff_images, overwrite=True)  ##
     # fits.writeto(frame_list[0].replace('.fits.fz', '.ramp.fits'), fit_image,overwrite=True)
 
-    return coeff_images
+    return coeff_images, cov_matrices
 
 print('slc')
 
 
 print('get_ramp_slope')
-coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=5)
-
+coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=1)
 
 # slopes,corrected_images = get_ramp_slope(full_file_list,supercpy,calFile,mask)
 # print(f'slopes={fit_image},cor_imgs={corrected_images}')
 
-#%%
-
-# img_cube_list = []
-# hdr_list = []
-# for f in frame_list:
-#     hdu = fits.open(f)
-#     d = hdu[image_hdu].data[:, 6:]  # Assumes data is in 1st HDU of FITS and headers are present
-#     h = hdu[image_hdu].header
-#     hdr_list.append(h)
-#     # Mask bad reference pixels
-#     dcpy = d.copy()
-#     dcpy[mask] = 0
-#     img_cube_list.append(dcpy)
-# dataIn = np.asarray(img_cube_list)
-
-#%%
-
-# Define the parameters
-frame_list = full_file_list
-superbias = supercpy
-calFile = calFile
-mask = mask
-slc = ((4, 4088), (4, 4088))
-degrees = 5
-
-# Prepare the y array
-y = []
-#%%
-
-print("RANDOM PRINTING STARTS HERE")
-for frame in frame_list:
-    out_img = irrc_correct_frame_file(frame, superbias, calFile)
-    if slc is not None:
-        out_img = out_img[:, slc[0][0]:slc[0][1], slc[1][0]:slc[1][1]]
-    y.append(out_img)
-x = np.arange(len(y))
-print(x.shape)
-y = np.asarray(y)
-y = y.reshape((x.shape[0], -1))
-print(y.shape)
-#%%
-# Fit the polynomial
-coeff_images = []
-for degree in range(1, degrees + 1):
-    coefficients = np.polyfit(x, y, degrees)
-    for coeff in coefficients:
-        coeff_image = coeff.reshape(out_img.shape)
-        coeff_images.append(coeff_image)
-
-# Stack the coefficients
-coeff_images = np.stack(coeff_images, axis=0)
-
-# Write coefficients to FITS file
-fits.writeto(frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits'), coeff_images, overwrite=True)
-
-# Display 'slc'
-print('slc')
-
-print(len(coeff_images))
 
 
