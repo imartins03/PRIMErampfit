@@ -128,12 +128,9 @@ def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088))
 
     coeff_images = np.stack(coeff_images,axis=0)
     cov_matrices = np.stack(cov_matrices,axis=0)
-    # hdu = fits.ImageHDU(coeff_images)
+
     fits.HDUList([fits.PrimaryHDU(coeff_images)]).writeto(frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits'), overwrite=True)
     fits.HDUList([fits.PrimaryHDU(cov_matrices)]).writeto(frame_list[0].replace('.fits.fz', f'.pcov_cb_{degrees}deg.fits'), overwrite=True)
-
-    # fits.writeto(frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits'), coeff_images, overwrite=True)  ##
-    # fits.writeto(frame_list[0].replace('.fits.fz', '.ramp.fits'), fit_image,overwrite=True)
 
     return coeff_images, cov_matrices
 
