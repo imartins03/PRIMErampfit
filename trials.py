@@ -61,21 +61,18 @@ def get_ramp_slope(frame_list, superbias, calFile, mask, slc=((4, 4088), (4, 408
         out_img[out_img > 20000] = np.nan
         y.append(out_img)
 
-    x = np.arange(len(frame_list))  # Adjusted to match the length of frame_list
+    x = np.arange(len(y))
 
     y = np.asarray(y)
     y = y.reshape((x.shape[0], -1))
 
-    # Masking NaNs for polynomial fitting
-    mask = np.isnan(y)
-    y_masked = np.ma.masked_array(y, mask)
+    mask_polyfit = np.isnan(y)
+    y_new = np.ma.masked_array(y, mask_polyfit) #this should, in theory, ignore the nan values
 
     coeff_images = []
-    try:
-        coefficients, cov_mat = np.polyfit(x, y_masked, degrees, cov=True)
-    except np.linalg.LinAlgError as e:
-        print("An error occurred during polynomial fitting: ", e)
-        return None, None
+
+    coefficients, cov_mat = np.polyfit(x, y_new, degrees, cov=True)
+
 
     for coeff in coefficients:
         coeff_image = coeff.reshape(out_img.shape)
@@ -97,6 +94,4 @@ def get_ramp_slope(frame_list, superbias, calFile, mask, slc=((4, 4088), (4, 408
 
     return coeff_images, cov_matrices
 
-
-print('Generating ramp slopes...')
 coeff_images, cov_matrices = get_ramp_slope(full_file_list, supercpy, calFile, mask, degrees=4)

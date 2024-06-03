@@ -229,7 +229,7 @@ def process_files(frame_list,superbias, calFile,multiThread=True, externalPixelF
         outpt = frame + ".out.fits"
         fits.writeto(outpt,out_img,overwrite=True)
 
-def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4088), (4,4088)),degrees=4):  # ((y1,y2), (x1,x2))
+def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4092), (4,4092)),degrees=4):  # ((y1,y2), (x1,x2))
     slopes = []
     corrected_images = []
     y=[]
