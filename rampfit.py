@@ -33,16 +33,16 @@ print(outfile)
 
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
 # r = (1124972, 1125497)
-r = (1124972, 1124972+100)
+r = (1124972, 1124972+10)
 
 file_list = [file_format.format(n) for n in range(*r)]
 full_file_list = file_list
 print(len(file_list))
 
-super_bias = fits.getdata('C:\\PycharmProjects\\PRIMErampfit\\IRRC_calfiles\\super_biasC1.fits.ramp.20231012')
-calFile = r'C:\PycharmProjects\PRIMErampfit\IRRC_calfiles\irrc_weights_C1.h5'
+super_bias = fits.getdata('IRRC_calfiles\\super_biasC1.fits.ramp.20231012')
+calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 
-maskFile = fits.getdata(r'C:\PycharmProjects\PRIMErampfit\IRRC_calfiles\C1_bad_ref_pix_mask.fits')
+maskFile = fits.getdata(r'IRRC_calfiles\C1_bad_ref_pix_mask.fits')
 mask = maskFile>0
 
 supercpy = super_bias.copy()
