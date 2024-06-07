@@ -209,36 +209,20 @@ coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=1)
 #%%
 def val(frame_list,superbias, calFile, mask, slc=((4,4092), (4,4092)),degrees=4, saturation=50000):
     for frame in frame_list:
-        out_img = irrc_correct_frame_file(frame,superbias,calFile)
-        if slc is not None:
-            print('slc')
-            print(out_img.shape)
-            out_img = out_img[:, slc[0][0]:slc[0][1], slc[1][0]:slc[1][1]]
-            print(out_img.shape)
-
-        #ISSUE HERE
-        saturation_mask = out_img > saturation
-        print(saturation_mask.sum()/np.prod(out_img.shape))
-        # out_img[saturation_mask] = np.nan
-
-        y.append(out_img)
-
-    x = np.arange(len(y))  #???
-    # x = np.asarray([i*np.ones(out_img.shape) for i in x])
-    y = np.asarray(y)
-    y = y.reshape((x.shape[0],-1))
-    for frame in frame_list:
         coeff_data = fits.getdata(full_file_list[0].replace('.fits.fz', f'.img_cb_1deg.fits'))
         x = np.arange(coeff_data.shape[0])
-        coefficients = np.polyfit(x, y, degrees, cov=True)
+        y = coeff_data
+        y=y.reshape((x.shape[0],-1))
+        coefficients, cov_mat = np.polyfit(x, y, degrees, cov=True)
         val = np.polyval(coeff_data,x)
         if slc is not None:
             val = val[:, slc[0][0]:slc[0][1], slc[1][0]:slc[1][1]]
-            # val_cube = np.array([fits.getdata(value) for value in val])
-            return val
-
+            val_cube = np.array([fits.getdata(value) for value in val])
+            return val, val_cube
+#%%
 val_cube = val(full_file_list,supercpy,calFile,mask,degrees=1)
 residuals_cube = coeff_images - val_cube #this didn't work because shapes are different
+
 
 fits.writeto('residuals.fits', residuals_cube, overwrite=True)
 plt.figure()
