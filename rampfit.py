@@ -210,7 +210,9 @@ coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=1)
 def val(frame_list,superbias, calFile, mask, slc=((4,4092), (4,4092)),degrees=4, saturation=50000):
     for frame in frame_list:
         coeff_data = fits.getdata(full_file_list[0].replace('.fits.fz', f'.img_cb_1deg.fits'))
-        val = np.polyval(degrees,coeff_data)
+        x = np.arange(coeff_data.shape[0])
+        coefficients, cov_mat = np.polyfit(x, y, degrees, cov=True)
+        val = np.polyval(coefficients,coeff_data)
         if slc is not None:
             val = val[:, slc[0][0]:slc[0][1], slc[1][0]:slc[1][1]]
             val_cube = np.array([fits.getdata(value) for value in val])
