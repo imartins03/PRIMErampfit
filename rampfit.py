@@ -17,8 +17,6 @@ from scipy.optimize import curve_fit
 from astropy.modeling.polynomial import Polynomial1D, Legendre1D
 from astropy.modeling import fitting
 
-
-
 # open the two images
 image1 = fits.getdata(r'D:\NLC\C1\01124973C1_ircc.fits')
 image2 = fits.getdata(r'D:\NLC\C1\01124972C1_ircc.fits')
@@ -188,7 +186,6 @@ def get_ramp_slope(frame_list,superbias, calFile, mask, slc=((4,4092), (4,4092))
     #coefficients = custom_curve_fit(x[idx], y[idx], degrees)
     coefficients[:, bad_pix] = np.nan
 
-    #ISSUE HERE WITH THE COVARIANCE
     for coeff in coefficients:
         coeff_image = coeff.reshape(out_img.shape)
         coeff_images.append(coeff_image)
@@ -209,12 +206,12 @@ coeff_images = get_ramp_slope(full_file_list,supercpy,calFile,mask,degrees=1)
 #%%
 def val(frame_list,superbias, calFile, mask, slc=((4,4092), (4,4092)),degrees=4, saturation=50000):
     for frame in frame_list:
-        coeff_data = fits.getdata(full_file_list[0].replace('.fits.fz', f'.img_cb_1deg.fits'))
+        coeff_data = fits.getdata(full_file_list[0].replace('.fits.fz', f'.img_data_cb_{degrees}deg.fits'))
         x = np.arange(coeff_data.shape[0])
         y = coeff_data
         y=y.reshape((x.shape[0],-1))
         coefficients, cov_mat = np.polyfit(x, y, degrees, cov=True)
-        val = np.polyval(coeff_data,x)
+        val = np.ma.polyval(coeff_data,x)
         if slc is not None:
             val = val[:, slc[0][0]:slc[0][1], slc[1][0]:slc[1][1]]
             val_cube = np.array([fits.getdata(value) for value in val])
