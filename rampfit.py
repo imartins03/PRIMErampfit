@@ -82,6 +82,7 @@ def get_ramp_slope(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 409
 #         output_arrays.append(output_array)
 #     return np.asarray(output_arrays)
 
+#nont poly array i just named it that so it would transfer easily
 def evaluate_poly_array(coeffs, x_array, poly_type='power'):
     output_arrays = []
     for x in x_array:
