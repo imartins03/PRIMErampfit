@@ -13,9 +13,11 @@ import scipy
 from scipy.optimize import curve_fit
 from astropy.modeling.polynomial import Polynomial1D, Legendre1D
 from astropy.modeling import fitting
+from numpy.polynomial.legendre import Legendre
+from numpy.polynomial.polynomial import Polynomial
 
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
-r = (1124972, 1124972 + 4)
+r = (1124972, 1124972 + 100)
 
 file_list = [file_format.format(n) for n in range(*r)]
 full_file_list = file_list
@@ -51,10 +53,8 @@ def irrc_correct_frame_file(filename, superbias, calFile, multiThread=True, exte
 def get_ramp_slope(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 4092)), degrees=1, saturation=50000):
     coeff_file = frame_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits')
     if os.path.exists(coeff_file):
-        print(f"Loading saved coefficients from {coeff_file}")
         coeff_images = fits.getdata(coeff_file)
     else:
-        print(f"Processing and saving coefficients to {coeff_file}")
         y = []
         for frame in frame_list:
             out_img = irrc_correct_frame_file(frame, superbias, calFile)
@@ -66,22 +66,35 @@ def get_ramp_slope(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 409
         y = np.asarray(y)
         y = y.reshape((x.shape[0], -1))
         sat_pix = (y > saturation).astype(float)
-        coefficients, _ = np.polyfit(x, y, degrees, cov=True)
+        # coefficients, _ = np.polyfit(x, y, degrees, cov=True)
+        coefficients, _ = np.polynomial.legendre.legfit(x, y, degrees, cov=True)
         coefficients[:, sat_pix.sum(axis=0) > 0] = np.nan
         coeff_images = np.stack([coeff.reshape(out_img.shape) for coeff in coefficients], axis=0)
         fits.HDUList([fits.PrimaryHDU(coeff_images)]).writeto(coeff_file, overwrite=True)
     return coeff_images
 
-def evaluate_poly_array(coeffs, x_array):
+# def evaluate_poly_array(coeffs, x_array):
+#     output_arrays = []
+#     for x in x_array:
+#         output_array = np.zeros(coeffs.shape[1])
+#         for n, coeff in enumerate(coeffs):
+#             output_array += coeff * (x ** n)
+#         output_arrays.append(output_array)
+#     return np.asarray(output_arrays)
+
+def evaluate_poly_array(coeffs, x_array, poly_type='power'):
     output_arrays = []
     for x in x_array:
-        output_array = np.zeros(coeffs.shape[1])
-        for n, coeff in enumerate(coeffs):
-            output_array += coeff * (x ** n)
-        output_arrays.append(output_array)
-    return np.asarray(output_arrays)
+        if poly_type == 'power':
+            output_array = np.zeros(coeffs.shape[1])
+            for n, coeff in enumerate(coeffs):
+                output_array += coeff*(x**n)
+        elif poly_type == 'legendre':
+            output_array = np.zeros(coeffs.shape[1])
+            for j in range(coeffs.shape[1]):
+                leg = Legendre(coeffs[:, j])
+                output_array[j] = leg(x)
 
-# Function to validate the fit cube
 def val(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 4092)), degrees=1, saturation=50000):
     coeff_data_file = full_file_list[0].replace('.fits.fz', f'.img_cb_{degrees}deg.fits')
     if not os.path.exists(coeff_data_file):
@@ -90,7 +103,7 @@ def val(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 4092)), degree
     coeff_data = fits.getdata(coeff_data_file)
     x = np.arange(len(frame_list))
     fit_coeff = coeff_data.reshape(2, 4088*4088)
-    val_fit = evaluate_poly_array(np.flip(fit_coeff, axis=0), x)
+    val_fit = evaluate_poly_array(np.flip(fit_coeff, axis=0), x, poly_type = 'legendre')
     return val_fit.reshape(len(frame_list), 4088, 4088)
 
 def residuals(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 4092)), degrees=1, saturation=50000):
@@ -104,7 +117,6 @@ def residuals(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 4092)), 
         fits.writeto(residual_file, residuals_cube, overwrite=True)
     return residuals_cube
 
-#Processing and saving fit cb once
 fit_cube_file = full_file_list[0].replace('.fits.fz', f'fit_cube_val.fits')
 if os.path.exists(fit_cube_file):
     fit_cube = fits.getdata(fit_cube_file)
@@ -119,7 +131,7 @@ fits.writeto(r'D:\NLC\C1\residuals_cb.fits', res, overwrite=True)
 plt.figure()
 bins = np.arange(-2*std,2*std, std/20)
 hist = np.histogram(res[np.isfinite(res)], bins=bins)
-plt.plot(hist[1][:-1], hist[0], color='blue')
+plt.bar(hist[1][:-1], hist[0], color='blue')
 plt.title('Histogram of Residuals')
 plt.xlabel('Residual Value')
 plt.ylabel('Frequency')
@@ -136,3 +148,16 @@ for frame in file_list:
 #table
 table = pd.DataFrame({'Mean': means, 'RMS': rms_vals})
 table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
+
+# res.shape[0] gives the number of elements along first dimension, corresponds number of frames
+for i, frame in enumerate(file_list):
+    plt.figure()
+    residuals_frame = res[i]
+    bins = np.arange(-2*std, 2*std, std/20)
+    hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
+    plt.bar(hist[1][:-1], hist[0], color='blue')
+    plt.title(f'Histogram of Residuals for Frame {i+1}')
+    plt.xlabel('Residual Value')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    plt.show()
