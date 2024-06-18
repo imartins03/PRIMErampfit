@@ -17,7 +17,7 @@ from numpy.polynomial.legendre import Legendre
 from numpy.polynomial.polynomial import Polynomial
 
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
-r = (1124972, 1124972 + 100)
+r = (1124972, 1124972+4)
 
 file_list = [file_format.format(n) for n in range(*r)]
 full_file_list = file_list
@@ -67,7 +67,7 @@ def get_ramp_slope(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 409
         y = y.reshape((x.shape[0], -1))
         sat_pix = (y > saturation).astype(float)
         # coefficients, _ = np.polyfit(x, y, degrees, cov=True)
-        coefficients, _ = np.polynomial.legendre.legfit(x, y, degrees, cov=True)
+        coefficients, _ = np.polynomial.legendre.legfit(x, y, degrees)
         coefficients[:, sat_pix.sum(axis=0) > 0] = np.nan
         coeff_images = np.stack([coeff.reshape(out_img.shape) for coeff in coefficients], axis=0)
         fits.HDUList([fits.PrimaryHDU(coeff_images)]).writeto(coeff_file, overwrite=True)
@@ -83,7 +83,7 @@ def get_ramp_slope(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 409
 #     return np.asarray(output_arrays)
 
 #nont poly array i just named it that so it would transfer easily
-def evaluate_poly_array(coeffs, x_array, poly_type='power'):
+def evaluate_poly_array(coeffs, x_array, poly_type='legendre'):
     output_arrays = []
     for x in x_array:
         if poly_type == 'power':
@@ -114,7 +114,7 @@ def residuals(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 4092)), 
     else:
         y_cb = fits.getdata(full_file_list[0].replace('.fits.fz', '.y_cb.fits'))
         y_new = y_cb.reshape(len(frame_list), 4088, 4088)
-        residuals_cube = y_new[3] - fit_cube[3]
+        residuals_cube = y_new - fit_cube
         fits.writeto(residual_file, residuals_cube, overwrite=True)
     return residuals_cube
 
@@ -129,15 +129,15 @@ res = residuals(full_file_list, supercpy, calFile, mask, degrees=3)
 std = np.nanstd(res)
 fits.writeto(r'D:\NLC\C1\residuals_cb.fits', res, overwrite=True)
 
-plt.figure()
-bins = np.arange(-2*std,2*std, std/20)
-hist = np.histogram(res[np.isfinite(res)], bins=bins)
-plt.bar(hist[1][:-1], hist[0], color='blue')
-plt.title('Histogram of Residuals')
-plt.xlabel('Residual Value')
-plt.ylabel('Frequency')
-plt.grid(True)
-plt.show()
+# plt.figure()
+# bins = np.arange(-2*std,2*std, std/20)
+# hist = np.histogram(res[np.isfinite(res)], bins=bins)
+# plt.bar(hist[1][:-1], hist[0], color='blue')
+# plt.title('Summary Histogram of Residuals')
+# plt.xlabel('Residual Value')
+# plt.ylabel('Frequency')
+# plt.grid(True)
+# plt.show()
 
 means = []
 rms_vals = []
@@ -146,7 +146,14 @@ for frame in file_list:
     means.append(np.mean(data))
     rms_vals.append(np.sqrt(np.mean(data**2)))
 
-#table
+# #table
+
+# if os.path.exists(fit_cube_file):
+#     fit_cube = fits.getdata(fit_cube_file)
+# else:
+#     fit_cube = val(full_file_list, supercpy, calFile, mask, degrees=3)
+#     fits.writeto(fit_cube_file, fit_cube, overwrite=True)
+
 table = pd.DataFrame({'Mean': means, 'RMS': rms_vals})
 table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 
