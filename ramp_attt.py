@@ -1,9 +1,20 @@
+from Demos.BackupRead_BackupWrite import outfile
+import math
+import sys
 import os
+import glob
 from astropy.io import fits
 import numpy as np
 from irrc.apply_correction import _load_coeffs_from_file, apply_in_memory
 from irrc.util import destripe
 import matplotlib.pyplot as plt
+import pandas as pd
+import scipy
+from scipy.optimize import curve_fit
+from astropy.modeling.polynomial import Polynomial1D, Legendre1D
+from astropy.modeling import fitting
+from numpy.polynomial.legendre import Legendre
+from numpy.polynomial.polynomial import Polynomial
 
 # Define paths and constants
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
@@ -26,34 +37,34 @@ mask = maskFile > 0
 supercpy = super_bias.copy()
 supercpy[mask[:, :4096]] = 0
 
-def irrc_correct_frame(dataIn, superbias, calFile, multiThread=True, externalPixelFlags=None, superbias_corrected=True):
-    """Returns image cube corrected using IRRC in memory, given calibration file."""
-    alpha, gamma, zeta = _load_coeffs_from_file(calFile)
-    dataIn_tmp = destripe(dataIn[None, :, :])
-    dataIn_tmp[:, :, :4096] -= superbias[None, :, :]
-    dataIRRC = apply_in_memory(dataIn_tmp, alpha, gamma, zeta, multiThread, externalPixelFlags, superbias_corrected) + superbias
-    return dataIRRC
-
-def irrc_correct_frame_file(filename, superbias, calFile, multiThread=True, externalPixelFlags=None, superbias_corrected=True):
-    dataIn = fits.getdata(filename)
-    dataIn = dataIn[:, 6:]
-    dcpy = dataIn.copy()
-    dcpy[mask] = 0
-    return irrc_correct_frame(dcpy, superbias, calFile, multiThread, externalPixelFlags, superbias_corrected)
-
-def generate_y_cube(frame_list, superbias, calFile, slc=((4, 4092), (4, 4092))):
-    y = []
-
-    for frame in frame_list:
-        out_img = irrc_correct_frame_file(frame, superbias, calFile)
-        if slc is not None:
-            out_img = out_img[:, slc[0][0]:slc[0][1], slc[1][0]:slc[1][1]]
-        y.append(out_img)
-    y = np.asarray(y)
-
-    fits.writeto(y_cube_path, y, overwrite=True)
-    return y
-
+# def irrc_correct_frame(dataIn, superbias, calFile, multiThread=True, externalPixelFlags=None, superbias_corrected=True):
+#     """Returns image cube corrected using IRRC in memory, given calibration file."""
+#     alpha, gamma, zeta = _load_coeffs_from_file(calFile)
+#     dataIn_tmp = destripe(dataIn[None, :, :])
+#     dataIn_tmp[:, :, :4096] -= superbias[None, :, :]
+#     dataIRRC = apply_in_memory(dataIn_tmp, alpha, gamma, zeta, multiThread, externalPixelFlags, superbias_corrected) + superbias
+#     return dataIRRC
+#
+# def irrc_correct_frame_file(filename, superbias, calFile, multiThread=True, externalPixelFlags=None, superbias_corrected=True):
+#     dataIn = fits.getdata(filename)
+#     dataIn = dataIn[:, 6:]
+#     dcpy = dataIn.copy()
+#     dcpy[mask] = 0
+#     return irrc_correct_frame(dcpy, superbias, calFile, multiThread, externalPixelFlags, superbias_corrected)
+#
+# def generate_y_cube(frame_list, superbias, calFile, slc=((4, 4092), (4, 4092))):
+#     y = []
+#
+#     for frame in frame_list:
+#         out_img = irrc_correct_frame_file(frame, superbias, calFile)
+#         if slc is not None:
+#             out_img = out_img[:, slc[0][0]:slc[0][1], slc[1][0]:slc[1][1]]
+#         y.append(out_img)
+#     y = np.asarray(y)
+#
+#     fits.writeto(y_cube_path, y, overwrite=True)
+#     return y
+#%%
 def evaluate_poly_array(coeffs, x_array):
     output_arrays = []
     for x in x_array:
@@ -65,6 +76,7 @@ def evaluate_poly_array(coeffs, x_array):
 
 def generate_fit_cube(frame_list, degrees=1, saturation=50000):
     y_cube = fits.getdata(y_cube_path)
+    print(np.ndim(y_cube))
     x = np.arange(len(frame_list))
     y = y_cube.reshape(x.shape[0], -1)
     coefficients, _ = np.polynomial.legendre.legfit(x, y, degrees)
@@ -73,6 +85,8 @@ def generate_fit_cube(frame_list, degrees=1, saturation=50000):
     fits.writeto(fit_cube_path, fit_cube, overwrite=True)
     return fit_cube
 
+fit_cube = generate_fit_cube(file_list)
+
 def calculate_residuals():
     y_cube = fits.getdata(y_cube_path)
     fit_cube = fits.getdata(fit_cube_path)
@@ -80,20 +94,24 @@ def calculate_residuals():
     fits.writeto(residuals_cube_path, residuals_cube, overwrite=True)
     return residuals_cube
 
-# Create y_cube if it doesn't exist
-if not os.path.exists(y_cube_path):
-    y_cube = generate_y_cube(full_file_list, supercpy, calFile)
-else:
-    y_cube = fits.getdata(y_cube_path)
+#%%
 
 # Create fit_cube if it doesn't exist
-if not os.path.exists(fit_cube_path):
-    fit_cube = generate_fit_cube(full_file_list, degrees=1)
-else:
-    fit_cube = fits.getdata(fit_cube_path)
-
-# Calculate residuals
+# if not os.path.exists(fit_cube_path):
+#     fit_cube = generate_fit_cube(full_file_list, degrees=1)
+# else:
+fit_cube = fits.getdata(fit_cube_path) #do the same thing as y cube
 res = calculate_residuals()
+
+means = []
+rms_vals = []
+for frame in file_list:
+    data = fits.getdata(frame)
+    means.append(np.mean(data))
+    rms_vals.append(np.sqrt(np.mean(data**2)))
+
+table = pd.DataFrame({'Mean': means, 'RMS': rms_vals})
+table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 
 # Plot residuals
 std = np.nanstd(res)
@@ -108,3 +126,4 @@ for i, frame in enumerate(file_list):
     plt.ylabel('Frequency')
     plt.grid(True)
     plt.show()
+
