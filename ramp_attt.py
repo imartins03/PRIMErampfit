@@ -78,7 +78,7 @@ def generate_fit_cube(frame_list, degrees=1, saturation=50000):
     y_cube = fits.getdata(y_cube_path)
     print(np.ndim(y_cube))
     x = np.arange(len(frame_list))
-    y = y_cube.reshape(x.shape[0], -1)
+    y = y_cube.reshape(len(frame_list), 4088, 4088)
     coefficients, _ = np.polynomial.legendre.legfit(x, y, degrees)
     fit_coeff = coefficients.reshape(degrees + 1, -1)
     fit_cube = evaluate_poly_array(np.flip(fit_coeff, axis=0), x).reshape(len(frame_list), *y_cube.shape[1:])
