@@ -14,9 +14,9 @@ calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 
 
-y_cube_path = 'y_cube.fits'
-fit_cube_path = 'fit_cube.fits'
-residuals_cube_path = 'residuals.fits'
+y_cube_path = r'D:\NLC\C1\y_cube.fits'
+fit_cube_path = r'D:\NLC\C1\fit_cube.fits'
+residuals_cube_path = r'D:\NLC\C1\residuals.fits'
 
 # Load necessary data
 super_bias = fits.getdata(super_bias_path)
