@@ -65,6 +65,7 @@ supercpy[mask[:, :4096]] = 0
 #
 #     fits.writeto(y_cube_path, y, overwrite=True)
 #     return y
+hey how are you
 #%%
 def evaluate_poly_array(coeffs, a_array):
     output_arrays = []
