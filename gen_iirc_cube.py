@@ -9,9 +9,9 @@ file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
 r = (1124972, 1124972 + 4)
 file_list = [file_format.format(n) for n in range(*r)]
 full_file_list = file_list
-super_bias_path = 'super_biasC1.fits.ramp.20231012'
+super_bias_path = 'IRRC_calfiles/super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
-maskFile_path = r'C1_bad_ref_pix_mask.fits'
+maskFile_path = r'IRRC_calfiles/C1_bad_ref_pix_mask.fits'
 
 
 y_cube_path = r'D:\NLC\C1\y_cube.fits'
@@ -54,5 +54,5 @@ def generate_y_cube(frame_list, superbias, calFile, slc=((4, 4092), (4, 4092))):
 
 y_cube = generate_y_cube(full_file_list, supercpy, calFile)  #call it once with this in the y function
 
-
+#stuff to change
 #
