@@ -65,7 +65,6 @@ supercpy[mask[:, :4096]] = 0
 #
 #     fits.writeto(y_cube_path, y, overwrite=True)
 #     return y
-hey how are you
 #%%
 def evaluate_poly_array(coeffs, a_array):
     output_arrays = []
@@ -116,13 +115,22 @@ generate_fit_cube(np.linspace(1,4,4), degrees, saturation)
     # fits.writeto(fit_cube_path, fit_cube, overwrite=True)
     # return fit_cube
 
+def calculate_residuals():
+    y_cube = fits.getdata(y_cube_path)
+    print(y_cube.shape)
+    y_cube.reshape(4, 4088, 4088)
 
-# def calculate_residuals():
-#     y_cube = fits.getdata(y_cube_path)
-#     fit_cube = fits.getdata(fit_cube_path)
-#     residuals_cube = y_cube - fit_cube
-#     fits.writeto(residuals_cube_path, residuals_cube, overwrite=True)
-#     return residuals_cube
+    fit_cube = fits.getdata(fit_cube_path)
+    print(fit_cube.shape)
+    residuals_cube = y_cube - fit_cube
+    fits.writeto(residuals_cube_path, residuals_cube, overwrite=True)
+
+    return residuals_cube
+
+y_cube = fits.getdata(y_cube_path)
+fit_cube = generate_fit_cube(y_cube, degrees=1, saturation=50000)
+# Calculate residuals
+residuals_cube = calculate_residuals()
 
 #%%
 
@@ -157,3 +165,21 @@ generate_fit_cube(np.linspace(1,4,4), degrees, saturation)
 #     plt.grid(True)
 #     plt.show()
 
+means = np.mean(y_cube, axis=(1, 2))
+rms_vals = np.sqrt(np.mean(y_cube**2, axis=(1, 2)))
+
+table = pd.DataFrame({'Mean': means, 'RMS': rms_vals})
+table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
+
+# Plot residuals
+std = np.nanstd(residuals_cube)
+for i, residuals_frame in enumerate(residuals_cube):
+    plt.figure()
+    bins = np.arange(-2 * std, 2 * std, std / 20)
+    hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
+    plt.bar(hist[1][:-1], hist[0], color='blue')
+    plt.title(f'Histogram of Residuals for Frame {i + 1}')
+    plt.xlabel('Residual Value')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    plt.show()

@@ -17,7 +17,7 @@ from numpy.polynomial.legendre import Legendre
 from numpy.polynomial.polynomial import Polynomial
 
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
-r = (1124972, 1124972+4)
+r = (1124972, 1124972+100)
 
 file_list = [file_format.format(n) for n in range(*r)]
 full_file_list = file_list
@@ -129,30 +129,12 @@ res = residuals(full_file_list, supercpy, calFile, mask, degrees=3)
 std = np.nanstd(res)
 fits.writeto(r'D:\NLC\C1\residuals_cb.fits', res, overwrite=True)
 
-# plt.figure()
-# bins = np.arange(-2*std,2*std, std/20)
-# hist = np.histogram(res[np.isfinite(res)], bins=bins)
-# plt.bar(hist[1][:-1], hist[0], color='blue')
-# plt.title('Summary Histogram of Residuals')
-# plt.xlabel('Residual Value')
-# plt.ylabel('Frequency')
-# plt.grid(True)
-# plt.show()
-
 means = []
 rms_vals = []
 for frame in file_list:
     data = fits.getdata(frame)
     means.append(np.mean(data))
     rms_vals.append(np.sqrt(np.mean(data**2)))
-
-# #table
-
-# if os.path.exists(fit_cube_file):
-#     fit_cube = fits.getdata(fit_cube_file)
-# else:
-#     fit_cube = val(full_file_list, supercpy, calFile, mask, degrees=3)
-#     fits.writeto(fit_cube_file, fit_cube, overwrite=True)
 
 table = pd.DataFrame({'Mean': means, 'RMS': rms_vals})
 table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
