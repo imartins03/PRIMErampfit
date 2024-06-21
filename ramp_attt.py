@@ -65,7 +65,6 @@ supercpy[mask[:, :4096]] = 0
 #
 #     fits.writeto(y_cube_path, y, overwrite=True)
 #     return y
-hey how are you
 #%%
 def evaluate_poly_array(coeffs, a_array):
     output_arrays = []
@@ -89,8 +88,8 @@ def generate_fit_cube(frame_num, degrees, saturation=50000):
     y_val = fits.writeto(r'D:\NLC\C1\y_values_reshape.fits', y, overwrite=True)
     z = np.arange(len(y))
     print(z)
-    # coefficients, _ = np.polynomial.legendre.legfit(z, y, degrees)
-    coefficients,_ = np.polyfit(z, y, degrees)
+    coefficients, _ = np.polynomial.legendre.legfit(z, y, degrees)
+    # coefficients,_ = np.polyfit(z, y, degrees)
 
     fit_coeff = coefficients.reshape(degrees + 1, -1)
     # fit_cube = evaluate_poly_array(np.flip(fit_coeff, axis=0), a).reshape(a, *y_cube.shape[1:])
@@ -117,12 +116,12 @@ generate_fit_cube(np.linspace(1,4,4), degrees, saturation)
     # return fit_cube
 
 
-# def calculate_residuals():
-#     y_cube = fits.getdata(y_cube_path)
-#     fit_cube = fits.getdata(fit_cube_path)
-#     residuals_cube = y_cube - fit_cube
-#     fits.writeto(residuals_cube_path, residuals_cube, overwrite=True)
-#     return residuals_cube
+def calculate_residuals():
+    y_cube = fits.getdata(y_cube_path)
+    fit_cube = fits.getdata(fit_cube_path)
+    residuals_cube = y_cube - fit_cube
+    fits.writeto(residuals_cube_path, residuals_cube, overwrite=True)
+    return residuals_cube
 
 #%%
 
