@@ -124,6 +124,23 @@ def calculate_residuals():
     return residuals_cube
 
 #%%
+y_cube_path = r'D:\NLC\C1\y_cube.fits'
+
+# Load y_cube data
+y_cube = fits.getdata(y_cube_path)
+
+means = []
+rms_vals = []
+for i in range(y_cube.shape[0]):
+    data = y_cube[i]
+    means.append(np.mean(data))
+    rms_vals.append(np.sqrt(np.mean(data**2)))
+
+# Create a DataFrame with mean and RMS values
+table = pd.DataFrame({'Mean': means, 'RMS': rms_vals})
+
+# Save the DataFrame to a CSV file
+table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 
 # Create fit_cube if it doesn't exist
 # if not os.path.exists(fit_cube_path):
@@ -155,4 +172,24 @@ def calculate_residuals():
 #     plt.ylabel('Frequency')
 #     plt.grid(True)
 #     plt.show()
+
+calculate_residuals()
+residuals_cube_path = r'D:\NLC\C1\residuals.fits'
+
+# Load residuals cube
+residuals_cube = fits.getdata(residuals_cube_path)
+#%%
+# Plot histograms of residuals for each frame
+std = np.nanstd(residuals_cube)
+for i in range(residuals_cube.shape[0]):
+    plt.figure()
+    residuals_frame = residuals_cube[i]
+    bins = np.arange(-2 * std, 2 * std, std / 20)
+    hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
+    plt.bar(hist[1][:-1], hist[0], color='blue')
+    plt.title(f'Histogram of Residuals for Frame {i + 1}')
+    plt.xlabel('Residual Value')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    plt.show()
 
