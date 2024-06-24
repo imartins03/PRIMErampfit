@@ -75,14 +75,23 @@ def calculate_residuals():
 
 res = calculate_residuals()
 
+initial_frame_label = 1124972
+
+frame_num = []
 means = []
 rms_vals = []
+median_vals = []
+std_vals = []
 for i in range(res.shape[0]):
     data = res[i]
     means.append(np.mean(data))
     rms_vals.append(np.sqrt(np.mean(data**2)))
+    median_vals.append(np.median(data))
+    std_vals.append(np.std(data))
+    frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
-table = pd.DataFrame({'Mean': means, 'RMS': rms_vals})
+
+table = pd.DataFrame({'Mean': means, 'RMS': rms_vals, 'Median': median_vals, 'StdDev': std_vals})
 table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 
 std = np.nanstd(res)
