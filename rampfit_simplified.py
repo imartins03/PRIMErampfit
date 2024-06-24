@@ -28,7 +28,7 @@ def evaluate_poly_array(coeffs, a_array, poly_type='power'):
             output_arrays.append(output_array)
     return np.asarray(output_arrays)
 
-def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
+def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=100):
     y_cube = fits.getdata(y_cube_path)
     print(np.ndim(y_cube))
     x = y_cube.shape[0]   #x is the dimension of the data cube (number of frames)
@@ -65,8 +65,8 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     return fit_cube
 
 saturation=50000
-degrees = 1
-generate_fit_cube(np.linspace(1,100,4), degrees, saturation)
+degrees = 6
+generate_fit_cube(np.linspace(1,100,100), degrees, saturation)
 
 def calculate_residuals():
     y_cube = fits.getdata(y_cube_path)
@@ -91,6 +91,7 @@ table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 std = np.nanstd(res)
 for i in range(res.shape[0]):
     plt.figure()
+
     residuals_frame = res[i]
     bins = np.arange(-2 * std, 2 * std, std / 20)
     hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
@@ -99,5 +100,7 @@ for i in range(res.shape[0]):
     plt.xlabel('Residual Value')
     plt.ylabel('Frequency')
     plt.grid(True)
-    plt.show()
+    plt.savefig()
+    # plt.show()
+    plt.clf()
 
