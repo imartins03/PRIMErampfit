@@ -87,7 +87,7 @@ res = calculate_residuals()
 # table = pd.DataFrame({'Frame': frame_num, 'Mean': means, 'RMS': rms_vals, 'Residual': residual_vals})
 # table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 
-initial_frame_label = 1124972
+first_frame = 1124972
 
 frame_num = []
 means = []
@@ -100,7 +100,7 @@ for i in range(res.shape[0]):
     rms_vals.append(np.sqrt(np.mean(data**2)))
     median_vals.append(np.median(data))
     std_vals.append(np.std(data))
-    frame_num.append(initial_frame_label + i)
+    frame_num.append(first_frame + i)
 
 table = pd.DataFrame({'Frame': frame_num, 'Mean': means, 'RMS': rms_vals, 'Median Res Val': median_vals, 'StdDev': std_vals})
 table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
@@ -109,7 +109,7 @@ std = np.nanstd(res)
 for i in range(res.shape[0]):
     plt.figure()
     residuals_frame = res[i]
-    bins = np.arange(-2 * std, 2 * std, std / 20)
+    bins = np.arange(-2*std, 2*std, std/20)
     hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
     plt.bar(hist[1][:-1], hist[0], color='blue')
     plt.title(f'Histogram of Residuals for Frame {i + 1}')
