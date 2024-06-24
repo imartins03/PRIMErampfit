@@ -28,30 +28,36 @@ def evaluate_poly_array(coeffs, a_array, poly_type='power'):
             output_arrays.append(output_array)
     return np.asarray(output_arrays)
 
-def generate_fit_cube(frame_num, degrees, saturation=50000):
+def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     y_cube = fits.getdata(y_cube_path)
     print(np.ndim(y_cube))
     x = y_cube.shape[0]   #x is the dimension of the data cube (number of frames)
-    # x = np.arange(len(file_list))
 
     y = y_cube.reshape(x, 4088, 4088)
+    if n_frames is not None:
+        y = y[:n_frames,:,:]
+        x = n_frames
     print(y.shape)
     y = y_cube.reshape(x, -1)
 
     print(y.shape)
-
+    #y_val = fits.writeto(r'D:\NLC\C1\y_values_reshape.fits', y, overwrite=True)
     z = np.arange(len(y))
     print(z)
     # coefficients, _ = np.polynomial.legendre.legfit(z, y, degrees)
     coefficients,_ = np.polyfit(z, y, degrees,cov=True)
 
+    # fit_coeff = coefficients.reshape(degrees + 1, -1)
     print(coefficients.shape)
     fit_coeff = coefficients.reshape(degrees+1,4088,4088)
     fits.writeto(fit_coeff_path, fit_coeff, overwrite=True)
     print(fit_coeff.shape)
     fit_cube = evaluate_poly_array(np.flip(coefficients, axis=0), z)
-
+    #fit_cube = evaluate_poly_array(np.flip(fit_coeff, axis=0), a).reshape(a, *y_cube.shape[1:])
     print(y.shape[1])
+
+    # fit_cube = evaluate_poly_array(np.flip(fit_coeff, axis=0),z)
+    # fit_cube = evaluate_poly_array(fit_coeff, z)
     print(fit_cube.shape)
 
     fit_cube = fit_cube.reshape(len(z), 4088, 4088)
@@ -60,7 +66,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000):
 
 saturation=50000
 degrees = 1
-generate_fit_cube(np.linspace(1,4,4), degrees, saturation)  #HAVE TO CHANGE
+generate_fit_cube(np.linspace(1,100,4), degrees, saturation)
 
 def calculate_residuals():
     y_cube = fits.getdata(y_cube_path)
@@ -72,44 +78,21 @@ def calculate_residuals():
 
 res = calculate_residuals()
 
-# frame_num = []
-# means = []
-# rms_vals = []
-# residual_vals = []
-#
-# for i in range(res.shape[0]):
-#     data = res[i]
-#     means.append(np.mean(data))
-#     rms_vals.append(np.sqrt(np.mean(data**2)))
-#     residual_vals.append(data)
-#     frame_num.append(i)   # 0 corresponds to 01124972
-#
-# table = pd.DataFrame({'Frame': frame_num, 'Mean': means, 'RMS': rms_vals, 'Residual': residual_vals})
-# table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
-
-first_frame = 1124972
-
-frame_num = []
 means = []
 rms_vals = []
-median_vals = []
-std_vals = []
 for i in range(res.shape[0]):
     data = res[i]
     means.append(np.mean(data))
     rms_vals.append(np.sqrt(np.mean(data**2)))
-    median_vals.append(np.median(data))
-    std_vals.append(np.std(data))
-    frame_num.append(first_frame + i)
 
-table = pd.DataFrame({'Frame': frame_num, 'Mean': means, 'RMS': rms_vals, 'Median Res Val': median_vals, 'StdDev': std_vals})
+table = pd.DataFrame({'Mean': means, 'RMS': rms_vals})
 table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 
 std = np.nanstd(res)
 for i in range(res.shape[0]):
     plt.figure()
     residuals_frame = res[i]
-    bins = np.arange(-2*std, 2*std, std/20)
+    bins = np.arange(-2 * std, 2 * std, std / 20)
     hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
     plt.bar(hist[1][:-1], hist[0], color='blue')
     plt.title(f'Histogram of Residuals for Frame {i + 1}')
