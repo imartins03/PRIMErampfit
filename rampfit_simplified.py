@@ -28,7 +28,7 @@ def evaluate_poly_array(coeffs, a_array, poly_type='power'):
             output_arrays.append(output_array)
     return np.asarray(output_arrays)
 
-def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=100):
+def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=4):
     y_cube = fits.getdata(y_cube_path)
     print(np.ndim(y_cube))
     x = y_cube.shape[0]   #x is the dimension of the data cube (number of frames)
