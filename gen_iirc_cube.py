@@ -53,6 +53,3 @@ def generate_y_cube(frame_list, superbias, calFile, slc=((4, 4092), (4, 4092))):
     return y
 
 y_cube = generate_y_cube(full_file_list, supercpy, calFile)  #call it once with this in the y function
-
-#stuff to change
-#
