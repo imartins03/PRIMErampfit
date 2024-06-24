@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # Define paths and constants
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
-r = (1124972, 1124972 + 525)
+r = (1124972, 1124972 + 100)
 file_list = [file_format.format(n) for n in range(*r)]
 full_file_list = file_list
 super_bias_path = 'IRRC_calfiles/super_biasC1.fits.ramp.20231012'

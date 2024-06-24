@@ -37,6 +37,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=4):
     if n_frames is not None:
         y = y[:n_frames,:,:]
         x = n_frames
+
     print(y.shape)
     y = y_cube.reshape(x, -1)
 
@@ -53,11 +54,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=4):
     fits.writeto(fit_coeff_path, fit_coeff, overwrite=True)
     print(fit_coeff.shape)
     fit_cube = evaluate_poly_array(np.flip(coefficients, axis=0), z)
-    #fit_cube = evaluate_poly_array(np.flip(fit_coeff, axis=0), a).reshape(a, *y_cube.shape[1:])
     print(y.shape[1])
-
-    # fit_cube = evaluate_poly_array(np.flip(fit_coeff, axis=0),z)
-    # fit_cube = evaluate_poly_array(fit_coeff, z)
     print(fit_cube.shape)
 
     fit_cube = fit_cube.reshape(len(z), 4088, 4088)
@@ -65,7 +62,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=4):
     return fit_cube
 
 saturation=50000
-degrees = 6
+degrees = 8
 generate_fit_cube(np.linspace(1,100,100), degrees, saturation)
 
 def calculate_residuals():
@@ -90,8 +87,7 @@ table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 
 std = np.nanstd(res)
 for i in range(res.shape[0]):
-    plt.figure()
-
+    # plt.figure()
     residuals_frame = res[i]
     bins = np.arange(-2 * std, 2 * std, std / 20)
     hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
@@ -100,7 +96,8 @@ for i in range(res.shape[0]):
     plt.xlabel('Residual Value')
     plt.ylabel('Frequency')
     plt.grid(True)
-    plt.savefig()
-    # plt.show()
+
     plt.clf()
+    plt.savefig(f'D:\\NLC\\C1\\hist_{i}.png')
+    # plt.show()
 
