@@ -8,7 +8,7 @@ import time
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_25.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
 fit_cube_path = r'D:\NLC\C1\fit_cube.fits'
 fit_coeff_path = r'D:\NLC\C1\fit_coeff.fits'
 residuals_cube_path = r'D:\NLC\C1\residuals.fits'
@@ -67,7 +67,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
 
 saturation=50000
 degrees = 6
-generate_fit_cube(np.linspace(1,25,25), degrees, saturation)
+generate_fit_cube(np.linspace(1,100,100), degrees, saturation)
 
 def calculate_residuals():
     y_cube = fits.getdata(y_cube_path)
@@ -101,10 +101,15 @@ table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 now_after = time.time()
 print('table loop', now_after-now_before)
 
-std = np.nanstd(res)
+
+# std = np.nanstd(res)
+
+now_before = time.time()
+
 for i in range(res.shape[0]):
     # plt.figure()
     residuals_frame = res[i]
+    std = rms_vals[i]
     bins = np.arange(-2 * std, 2 * std, std / 20)
     hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
     plt.bar(hist[1][:-1], hist[0], color='blue')
@@ -118,3 +123,5 @@ for i in range(res.shape[0]):
     plt.clf()
     # plt.show()
 
+now_after = time.time()
+print('hist', now_after-now_before)
