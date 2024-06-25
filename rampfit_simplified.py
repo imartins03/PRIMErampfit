@@ -6,7 +6,7 @@ import pandas as pd
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_25.fits'
 fit_cube_path = r'D:\NLC\C1\fit_cube.fits'
 fit_coeff_path = r'D:\NLC\C1\fit_coeff.fits'
 residuals_cube_path = r'D:\NLC\C1\residuals.fits'
@@ -28,7 +28,7 @@ def evaluate_poly_array(coeffs, a_array, poly_type='power'):
             output_arrays.append(output_array)
     return np.asarray(output_arrays)
 
-def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=4):
+def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     y_cube = fits.getdata(y_cube_path)
     print(np.ndim(y_cube))
     x = y_cube.shape[0]   #x is the dimension of the data cube (number of frames)
@@ -62,8 +62,8 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=4):
     return fit_cube
 
 saturation=50000
-degrees = 8
-generate_fit_cube(np.linspace(1,100,100), degrees, saturation)
+degrees = 6
+generate_fit_cube(np.linspace(1,25,25), degrees, saturation)
 
 def calculate_residuals():
     y_cube = fits.getdata(y_cube_path)
@@ -75,38 +75,30 @@ def calculate_residuals():
 
 res = calculate_residuals()
 
-initial_frame_label = 1124972
-
-frame_num = []
 means = []
 rms_vals = []
-median_vals = []
-std_vals = []
 for i in range(res.shape[0]):
     data = res[i]
     means.append(np.mean(data))
     rms_vals.append(np.sqrt(np.mean(data**2)))
-    median_vals.append(np.median(data))
-    std_vals.append(np.std(data))
-    frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
-
-table = pd.DataFrame({'Mean': means, 'RMS': rms_vals, 'Median': median_vals, 'StdDev': std_vals})
+table = pd.DataFrame({'Mean': means, 'RMS': rms_vals})
 table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
 
+first_frame = 1124972
 std = np.nanstd(res)
 for i in range(res.shape[0]):
+    frame_num = first_frame + i
     # plt.figure()
     residuals_frame = res[i]
     bins = np.arange(-2 * std, 2 * std, std / 20)
     hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
     plt.bar(hist[1][:-1], hist[0], color='blue')
-    plt.title(f'Histogram of Residuals for Frame {i + 1}')
+    plt.title(f'Histogram of Residuals for Frame {frame_num}')
     plt.xlabel('Residual Value')
     plt.ylabel('Frequency')
     plt.grid(True)
 
     plt.clf()
-    plt.savefig(f'D:\\NLC\\C1\\hist_{i}.png')
+    plt.savefig(f'D:\\NLC\\C1\\hist_{frame_num}.png')
     # plt.show()
-
