@@ -6,7 +6,7 @@ import pandas as pd
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_sec25.fits'
+y_cube_path = r'D:\NLC\C1\y_cube.fits'
 fit_cube_path = r'D:\NLC\C1\fit_cube.fits'
 fit_coeff_path = r'D:\NLC\C1\fit_coeff.fits'
 residuals_cube_path = r'D:\NLC\C1\residuals.fits'
@@ -94,13 +94,13 @@ for i in range(res.shape[0]):
     bins = np.arange(-2 * std, 2 * std, std / 20)
     hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
     plt.bar(hist[1][:-1], hist[0], color='blue')
-    plt.title(f'Histogram of Residuals for Frame {i + 25}')
+    plt.title(f'Histogram of Residuals for Frame {i}')
     plt.xlabel('Residual Value')
     plt.ylabel('Frequency')
     plt.grid(True)
 
 
-    plt.savefig(f'D:\\NLC\\C1\\hist_{i+25}.png')
+    plt.savefig(f'D:\\NLC\\C1\\hist_{i}.png')
     plt.clf()
     # plt.show()
 
