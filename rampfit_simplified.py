@@ -2,11 +2,13 @@ from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import datetime
+import time
 
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_25.fits'
 fit_cube_path = r'D:\NLC\C1\fit_cube.fits'
 fit_coeff_path = r'D:\NLC\C1\fit_coeff.fits'
 residuals_cube_path = r'D:\NLC\C1\residuals.fits'
@@ -17,10 +19,12 @@ mask = maskFile > 0
 supercpy = super_bias.copy()
 supercpy[mask[:, :4096]] = 0
 
+
+#%%
 def evaluate_poly_array(coeffs, a_array, poly_type='power'):
     output_arrays = []
     for a in a_array:
-        print(a)
+        print(a)   #calculating polynomial coefficients
         if poly_type == 'power':
             output_array = np.zeros(coeffs.shape[1])
             for n, coeff in enumerate(coeffs):
@@ -63,7 +67,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
 
 saturation=50000
 degrees = 6
-generate_fit_cube(np.linspace(1,100,100), degrees, saturation)
+generate_fit_cube(np.linspace(1,25,25), degrees, saturation)
 
 def calculate_residuals():
     y_cube = fits.getdata(y_cube_path)
@@ -73,22 +77,29 @@ def calculate_residuals():
     fits.writeto(residuals_cube_path, residuals_cube, overwrite=True)
     return residuals_cube
 
+now_before = time.time()
 res = calculate_residuals()
+now_after = time.time()
+print(now_after-now_before)
+
+
+now_before = time.time()
 
 means = []
 rms_vals = []
 medians = []
-std = []
 
 for i in range(res.shape[0]):
     data = res[i]
     means.append(np.mean(data))
     rms_vals.append(np.sqrt(np.mean(data**2)))
     medians.append(np.median(data))
-    std.append(np.std(data))
 
-table = pd.DataFrame({'Frame': [1124972 + i for i in range(res.shape[0])], 'Mean': means, 'RMS': rms_vals, 'Median': medians, 'Std': std, })
+table = pd.DataFrame({'Frame': [1124972 + i for i in range(res.shape[0])], 'Mean': means, 'RMS': rms_vals, 'Median': medians})
 table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)
+
+now_after = time.time()
+print('table loop', now_after-now_before)
 
 std = np.nanstd(res)
 for i in range(res.shape[0]):
