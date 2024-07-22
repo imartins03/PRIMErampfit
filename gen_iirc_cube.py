@@ -32,7 +32,7 @@ def irrc_correct_frame(dataIn, superbias, calFile, multiThread=True, externalPix
 
 def irrc_correct_frame_file(filename, superbias, calFile, multiThread=True, externalPixelFlags=None, superbias_corrected=True):
     dataIn = fits.getdata(filename)  # Load data from FITS file
-    dataIn = dataIn[:, 6:]  # Adjust data by removing first 6 columns
+    dataIn = dataIn[:, 6:]  # Adjust data by removing first 6 columns?
     dcpy = dataIn.copy()  # Create a copy of the data
     dcpy[mask] = 0  # Apply mask to the data copy
     return irrc_correct_frame(dcpy, superbias, calFile, multiThread, externalPixelFlags, superbias_corrected)  # Correct the frame using IRRC
