@@ -44,11 +44,17 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     print(y.shape)
     y = y_cube.reshape(x, -1)  # Reshape y_cube for fitting
 
+    #saturation_mask = y > saturation
+    # sat_pix = (saturation_mask).astype(float)
+
+
     print(y.shape)
     z = np.arange(len(y))  # Generate array for fitting
     print(z)
 
     coefficients, _ = np.polyfit(z, y, degrees, cov=True)  # Fit polynomial
+    #coefficients[:, sat_pix.sum(axis=0) > 0] = np.nan
+
     print(coefficients.shape)
     fit_coeff = coefficients.reshape(degrees + 1, 4088, 4088)  # Reshape coefficients
     fits.writeto(fit_coeff_path, fit_coeff, overwrite=True)  # Save coefficients
