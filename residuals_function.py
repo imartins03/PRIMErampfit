@@ -49,10 +49,16 @@ res = fits.getdata(residuals_cube_path)
 
 
 for i in range(res.shape[0]):
-    std = np.nanstd(res[i])
-    mean = np.nanmean(res[i])
+
     residuals_frame = res[i]
-    stats = df.loc()[i]
+
+    # std = np.nanstd(res[i])
+    # mean = np.nanmean(res[i])
+
+    mean = df.loc[i, 'Mean']
+    std = df.loc[i, 'StdDev']
+
+    # stats = df.loc()[i]
     bins = np.arange(-3 * std+mean,mean+ 3 * std, std / 20)  # Generate histogram bins
     hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
     plt.bar(hist[1][:-1], hist[0], color='blue')  # Plot histogram
