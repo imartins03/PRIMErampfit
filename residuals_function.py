@@ -61,11 +61,14 @@ for i in range(res.shape[0]):
     # stats = df.loc()[i]
     bins = np.arange(-3 * std+mean,mean+ 3 * std, std / 20)  # Generate histogram bins
     hist = np.histogram(residuals_frame[np.isfinite(residuals_frame)], bins=bins)
-    plt.bar(hist[1][:-1], hist[0], color='blue')  # Plot histogram
+    plt.bar(hist[1][:-1], hist[0], color='blue', width = std/20)  # Plot histogram
     plt.title(f'Histogram of Residuals for Frame {i + 1}')
     plt.xlabel('Residual Value')
     plt.ylabel('Frequency')
+    plt.xlim((bins.min(), bins.max()))
     plt.grid(True)
 
     plt.savefig(f'D:\\NLC\\C1\\hist_{i}.png')  # Save histogram plot
+    if i%10 == 0:
+        plt.show()
     plt.clf()
