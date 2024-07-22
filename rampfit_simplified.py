@@ -98,8 +98,6 @@ for i in range(res.shape[0]):
     plt.xlabel('Residual Value')
     plt.ylabel('Frequency')
     plt.grid(True)
-
-
     plt.savefig(f'D:\\NLC\\C1\\hist_{i}.png')
     plt.clf()
     # plt.show()
