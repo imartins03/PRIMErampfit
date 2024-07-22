@@ -46,6 +46,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
 
     # saturation_mask = y > saturation
     # sat_pix = (saturation_mask).astype(float)
+    #mask stuff
 
     print(y.shape)
     z = np.arange(len(y))  # Generate array for fitting
