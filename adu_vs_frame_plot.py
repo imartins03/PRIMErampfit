@@ -143,3 +143,4 @@ plt.grid(True)
 plt.savefig(r'D:\NLC\C1\median_superpix_values_plot.png')  # Save the plot
 plt.show()
 
+#save
