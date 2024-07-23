@@ -46,8 +46,6 @@ res = fits.getdata(residuals_cube_path)
     # table = pd.DataFrame({'Mean': means, 'RMS': rms_vals, 'Median': median_vals, 'StdDev': std_vals})
     # table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)  # Save statistics to CSV
 
-
-
 for i in range(res.shape[0]):
 
     residuals_frame = res[i]
@@ -72,3 +70,6 @@ for i in range(res.shape[0]):
     if i%10 == 0:
         plt.show()
     plt.clf()
+
+
+
