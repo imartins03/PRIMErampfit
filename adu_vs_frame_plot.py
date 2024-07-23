@@ -62,3 +62,4 @@ plt.xlabel('Frame Number')
 plt.ylabel('Median ADU Value')
 plt.title('Median ADU Value vs. Frame Number')
 plt.show()
+  #hey
