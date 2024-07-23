@@ -137,7 +137,7 @@ for frame_n in range(y.shape[0]):
     median_values.append(median_value)
 
 # Plot the median values as a function of frame number
-plt.plot(frame_numbers, median_values, marker='o', linestyle='-', color='black')
+plt.plot(frame_numbers, median_values, color='black')
 plt.title('Median of 256x256 super pixel from Center as a Function of Frame Number')
 plt.xlabel('Frame Number')
 plt.ylabel('Median Value of 256x256 superpixel')
