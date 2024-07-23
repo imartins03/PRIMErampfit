@@ -125,7 +125,8 @@ frame_numbers = np.arange(y.shape[0])
 
 # Iterate over each frame
 for frame_n in range(y.shape[0]):
-    frame = y[frame_n, 0]
+    frame = y[frame_n]
+    print(len(frame))
 
     # Extract 256x256 square from the center
     superpix = frame[center_x - half_size:center_x + half_size,
@@ -143,4 +144,4 @@ plt.grid(True)
 plt.savefig(r'D:\NLC\C1\median_superpix_values_plot.png')  # Save the plot
 plt.show()
 
-#save stuff
+
