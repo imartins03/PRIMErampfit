@@ -33,8 +33,8 @@
 # plt.show()
 
 #keep this stuff
-import numpy as np
-import matplotlib.pyplot as plt
+# import numpy as np
+# import matplotlib.pyplot as plt
 
 # Assuming 'cube' is a 4D numpy array of shape (100, 4088, 4088)
 # with dimensions [frames, height, width]
@@ -106,24 +106,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Path to y_cube FITS file
-y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
-y_cube = fits.getdata(y_cube_path)
-y = y_cube.reshape(y_cube.shape[0], y_cube.shape[2], y_cube.shape[3])
+# y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
+# y_cube = fits.getdata(y_cube_path)
+# y = y_cube.reshape(y_cube.shape[0], y_cube.shape[2], y_cube.shape[3])
+# center_x, center_y = y.shape[1]//2, y.shape[2]//2
+# superpix_size = 256
+# half_size = superpix_size//2
+
+residuals_cube_path = r'D:\NLC\C1\residuals.fits'
+y = fits.getdata(residuals_cube_path)
 center_x, center_y = y.shape[1]//2, y.shape[2]//2
 superpix_size = 256
 half_size = superpix_size//2
 
 # Initialize lists to store median values and frame numbers
 median_values = []
-frame_numbers = np.arange(y_cube.shape[0])
+frame_numbers = np.arange(y.shape[0])
 
 # Iterate over each frame
-for frame_n in range(y_cube.shape[0]):
-    frame = y_cube[frame_n, 0]
+for frame_n in range(y.shape[0]):
+    frame = y[frame_n, 0]
 
     # Extract 256x256 square from the center
     superpix = frame[center_x - half_size:center_x + half_size,
-             center_y - half_size:center_y + half_size]
+                     center_y - half_size:center_y + half_size]
 
     median_value = np.median(superpix)
     median_values.append(median_value)
