@@ -30,8 +30,7 @@
 # plt.grid(True)
 # plt.show()
 
-
-
+#keep this stuff
 import numpy as np
 import matplotlib.pyplot as plt
 
