@@ -107,18 +107,18 @@ import matplotlib.pyplot as plt
 
 #
 # Path to y_cube FITS file
-# y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
-# y_cube = fits.getdata(y_cube_path)
-# y = y_cube.reshape(y_cube.shape[0], y_cube.shape[2], y_cube.shape[3])
-# center_x, center_y = y.shape[1]//2, y.shape[2]//2
-# superpix_size = 256
-# half_size = superpix_size//2
-
-residuals_cube_path = r'D:\NLC\C1\residuals.fits'
-y = fits.getdata(residuals_cube_path)
+y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
+y_cube = fits.getdata(y_cube_path)
+y = y_cube.reshape(y_cube.shape[0], y_cube.shape[2], y_cube.shape[3])
 center_x, center_y = y.shape[1]//2, y.shape[2]//2
 superpix_size = 256
 half_size = superpix_size//2
+
+# residuals_cube_path = r'D:\NLC\C1\residuals.fits'
+# y = fits.getdata(residuals_cube_path)
+# center_x, center_y = y.shape[1]//2, y.shape[2]//2
+# superpix_size = 256
+# half_size = superpix_size//2
 
 # Initialize lists to store median values and frame numbers
 median_values = []

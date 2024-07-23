@@ -16,7 +16,7 @@ stat_table = r'D:\NLC\C1\frame_statistics.csv'
 
 def calculate_residuals():
     y_cube = fits.getdata(y_cube_path)[:n_frames]  # Load y_cube data
-    y_cube = y_cube[:, 0, :, :]  # Select the first element along the second axis
+    y_cube = y_cube[:, 0, :, :]  # take out the second dimension
     fit_cube = fits.getdata(fit_cube_path)[:n_frames]  # Load fit cube data
     residuals_cube = y_cube - fit_cube  # Calculate residuals
     fits.writeto(residuals_cube_path, residuals_cube, overwrite=True)  # Save residuals cube
