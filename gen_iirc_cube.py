@@ -12,7 +12,7 @@ super_bias_path = 'IRRC_calfiles/super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles/C1_bad_ref_pix_mask.fits'
 
-y_cube_path = r'D:\NLC\C1\y_cube.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
 fit_cube_path = r'D:\NLC\C1\fit_cube.fits'
 residuals_cube_path = r'D:\NLC\C1\residuals.fits'
 
