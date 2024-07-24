@@ -28,7 +28,7 @@ frame_numbers = np.arange(y.shape[0])
 
 # Iterate over each frame
 for frame_n in range(y.shape[0]):
-    frame = y[frame_n, 0]
+    frame = y[frame_n]
 
     # Extract 256x256 square from the center
     superpix = frame[center_x - half_size:center_x + half_size,
