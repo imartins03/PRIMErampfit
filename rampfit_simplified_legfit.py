@@ -30,6 +30,10 @@ def evaluate_legendre_poly(coeffs, a_array):
 
     return np.asarray(output_arrays)
 
+# def evaluate_legendre_poly(coeffs, x):
+#     L = np.polynomial.legendre.Legendre(coeffs)
+#     return L(x)
+
 def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     y_cube = fits.getdata(y_cube_path)  # Load y_cube data
     print(np.ndim(y_cube))
