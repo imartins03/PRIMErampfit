@@ -8,11 +8,10 @@ super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
-
-fit_cube_path = r'D:\NLC\C1\fit_cube_poly.fits'
-fit_coeff_path = r'D:\NLC\C1\fit_coeff_poly.fits'
-residuals_cube_path = r'D:\NLC\C1\residuals_poly.fits'
-stat_table = r'D:\NLC\C1\frame_statistics_poly.csv'
+fit_cube_path = r'D:\NLC\C1\fit_cube_leg.fits'
+fit_coeff_path = r'D:\NLC\C1\fit_coeff_leg.fits'
+residuals_cube_path = r'D:\NLC\C1\residuals_leg.fits'
+stat_table = r'D:\NLC\C1\frame_statistics_leg.csv'
 
 n_frames = 100
 
