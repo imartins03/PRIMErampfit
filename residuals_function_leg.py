@@ -46,9 +46,9 @@ for i in range(res.shape[0]):
         frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
 table = pd.DataFrame({'Mean': means, 'RMS': rms_vals, 'Median': median_vals, 'StdDev': std_vals})
-table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)  # Save statistics to CSV
+table.to_csv(r'D:\NLC\C1\frame_statistics_leg.csv', index=False)  # Save statistics to CSV
 
-df = pd.read_csv(r'D:\NLC\C1\frame_statistics.csv')
+# df = pd.read_csv(r'D:\NLC\C1\frame_statistics_leg.csv')
 
 # for i in range(res.shape[0]):
 #
