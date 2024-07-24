@@ -9,10 +9,9 @@ super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
-fit_cube_path = r'D:\NLC\C1\fit_cube_poly.fits'
-fit_cube_path_leg = r'D:\NLC\C1\fit_cube_legendre.fits'
-fit_coeff_path = r'D:\NLC\C1\fit_coeff.fits'
-residuals_cube_path = r'D:\NLC\C1\residuals.fits'
+fit_cube_path = r'D:\NLC\C1\fit_cube_leg.fits'
+fit_coeff_path = r'D:\NLC\C1\fit_coeff_leg.fits'
+residuals_cube_path = r'D:\NLC\C1\residuals_leg.fits'
 
 #getting data from existing files
 super_bias = fits.getdata(super_bias_path)  # Load super bias data
@@ -21,29 +20,15 @@ mask = maskFile > 0  # Create mask for bad pixels
 supercpy = super_bias.copy()  # Create a copy of the super bias
 supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
 
-def evaluate_poly_array(coeffs, a_array, poly_type='power'):
-    # Function to evaluate polynomial arrays
+def evaluate_legendre_poly(coeffs, a_array):
     output_arrays = []
-    for a in a_array:  # Loop over input values
-        print(a)
-        if poly_type == 'power':  # Only 'power' type is considered here
-            output_array = np.zeros(coeffs.shape[1])  # Initialize output array
-            for n, coeff in enumerate(coeffs):  # Loop over coefficients
-                output_array += coeff * (a ** n)  # Calculate polynomial value
-            output_arrays.append(output_array)  # Append result to list
-    return np.asarray(output_arrays)  # Convert list to numpy array
+    for a in a_array:
+        output = 0.0
+        for n, coeff in enumerate(coeffs):
+            output += coeff * np.polynomial.legendre.Legendre.basis(n)(a)
+        output_arrays.append(output)
 
-
-# def evaluate_legendre_poly(coeffs, a_array):
-#     output_arrays = []
-#     for a in a_array:
-#         output = 0.0
-#         for n, coeff in enumerate(coeffs):
-#             output += coeff * np.polynomial.legendre.Legendre.basis(n)(a)
-#         output_arrays.append(output)
-#
-#     return np.asarray(output_arrays)
-
+    return np.asarray(output_arrays)
 
 def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     y_cube = fits.getdata(y_cube_path)  # Load y_cube data
@@ -70,10 +55,10 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     # Generate array for fitting, time in units of frames
     print(time)
 
-    coefficients, _ = np.polyfit(time, y, degrees, cov=True)  # Fit polynomial
+    # coefficients, _ = np.polyfit(time, y, degrees, cov=True)  # Fit polynomial
     # coefficients[:, sat_pix.sum(axis=0) > 0] = np.nan
 
-    # coefficients = np.polynomial.legendre.legfit(time,y,degrees)
+    coefficients = np.polynomial.legendre.legfit(time,y,degrees)
 
     print(coefficients.shape)
     # np.arange(-1, 1, 2/100+1)
@@ -81,9 +66,8 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     fit_coeff = coefficients.reshape(degrees + 1, 4088, 4088)  # Reshape coefficients
     fits.writeto(fit_coeff_path, fit_coeff, overwrite=True)  # Save coefficients
     print(fit_coeff.shape)
-    fit_cube = evaluate_poly_array(np.flip(coefficients, axis=0), time)  # Evaluate polynomial array
 
-    # fit_cube = evaluate_legendre_poly(coefficients, time)
+    fit_cube = evaluate_legendre_poly(coefficients, time)
     print(y.shape[1])
     print(fit_cube.shape)
 
