@@ -7,7 +7,7 @@ import pandas as pd
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
 fit_cube_path = r'D:\NLC\C1\fit_cube_leg.fits'
 fit_coeff_path = r'D:\NLC\C1\fit_coeff_leg.fits'
 residuals_cube_path = r'D:\NLC\C1\residuals_leg.fits'
@@ -46,9 +46,9 @@ for i in range(res.shape[0]):
         frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
 table = pd.DataFrame({'Mean': means, 'RMS': rms_vals, 'Median': median_vals, 'StdDev': std_vals})
-table.to_csv(r'D:\NLC\C1\frame_statistics.csv', index=False)  # Save statistics to CSV
+table.to_csv(r'D:\NLC\C1\frame_statistics_leg.csv', index=False)  # Save statistics to CSV
 
-df = pd.read_csv(r'D:\NLC\C1\frame_statistics.csv')
+# df = pd.read_csv(r'D:\NLC\C1\frame_statistics_leg.csv')
 
 # for i in range(res.shape[0]):
 #
