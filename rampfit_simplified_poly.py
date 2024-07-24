@@ -56,6 +56,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     print(time)
 
     coefficients, _ = np.polyfit(time, y, degrees, cov=True)  # Fit polynomial
+    print('poly fitting coefficients:', coefficients)
     # coefficients[:, sat_pix.sum(axis=0) > 0] = np.nan
 
     print(coefficients.shape)
@@ -64,6 +65,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     fits.writeto(fit_coeff_path, fit_coeff, overwrite=True)  # Save coefficients
     print(fit_coeff.shape)
     fit_cube = evaluate_poly_array(np.flip(coefficients, axis=0), time)  # Evaluate polynomial array
+    print('poly',fit_cube)
 
     # fit_cube = evaluate_legendre_poly(coefficients, time)
     print(y.shape[1])

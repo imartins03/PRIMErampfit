@@ -20,19 +20,23 @@ mask = maskFile > 0  # Create mask for bad pixels
 supercpy = super_bias.copy()  # Create a copy of the super bias
 supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
 
-def evaluate_legendre_poly(coeffs, a_array):
-    output_arrays = []
-    for a in a_array:
-        output = 0.0
-        for n, coeff in enumerate(coeffs):
-            output += coeff * np.polynomial.legendre.Legendre.basis(n)(a)
-        output_arrays.append(output)
-
-    return np.asarray(output_arrays)
+# def evaluate_legendre_poly(coeffs, a_array):
+#     output_arrays = []
+#     for a in a_array:
+#         output = 0.0
+#         for n, coeff in enumerate(coeffs):
+#             output += coeff * np.polynomial.legendre.Legendre.basis(n)(a)
+#         output_arrays.append(output)
+#
+#     return np.asarray(output_arrays)
 
 # def evaluate_legendre_poly(coeffs, x):
 #     L = np.polynomial.legendre.Legendre(coeffs)
 #     return L(x)
+
+def evaluate_legendre_poly(coeffs, x):
+    return np.polynomial.legendre.legval(x,coeffs)
+    # return L(x)
 
 def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     y_cube = fits.getdata(y_cube_path)  # Load y_cube data
@@ -52,8 +56,8 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     #mask stuff
 
     print(y.shape)
-    time = np.arange(len(y), dtype=np.double)
-    # time = np.linspace(-1, 1, 100, dtype=np.double)  # legendre time
+    # time = np.arange(len(y), dtype=np.double)
+    time = np.linspace(-1, 1, 100, dtype=np.double)  # legendre time
 
 
     # Generate array for fitting, time in units of frames
@@ -63,6 +67,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     # coefficients[:, sat_pix.sum(axis=0) > 0] = np.nan
 
     coefficients = np.polynomial.legendre.legfit(time,y,degrees)
+    print('fitting coefficients',coefficients)
 
     print(coefficients.shape)
     # np.arange(-1, 1, 2/100+1)
@@ -74,6 +79,7 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     fit_cube = evaluate_legendre_poly(coefficients, time)
     print(y.shape[1])
     print(fit_cube.shape)
+    print('leg',fit_cube)
 
     fit_cube = fit_cube.reshape(len(time), 4088, 4088)  # Reshape fit cube
     fits.writeto(fit_cube_path, fit_cube, overwrite=True)  # Save fit cube
