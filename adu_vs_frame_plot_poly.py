@@ -39,11 +39,10 @@ for frame_n in range(y.shape[0]):
 
 # Plot the median values as a function of frame number
 plt.plot(frame_numbers, median_values, marker='o', linestyle='-', color='black')
-plt.title('Median of 256x256 super pixel from Center as a Function of Frame Number')
+plt.title('Median of 256x256 super pixel from Center as a Function of Frame Number (polyfit)')
 plt.xlabel('Frame Number')
 plt.ylabel('Median Value of 256x256 superpixel')
 plt.grid(True)
-plt.savefig(r'D:\NLC\C1\median_superpix_values_plot.png')  # Save the plot
+plt.savefig(r'D:\NLC\C1\median_superpix_plot_poly.png')  # Save the plot
 plt.show()
 
-#save stuff
