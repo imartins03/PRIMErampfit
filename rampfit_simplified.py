@@ -10,8 +10,8 @@ calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
 fit_cube_path = r'D:\NLC\C1\fit_cube_poly.fits'
-fit_coeff_path = r'D:\NLC\C1\fit_coeff.fits'
-residuals_cube_path = r'D:\NLC\C1\residuals.fits'
+fit_coeff_path = r'D:\NLC\C1\fit_coeff_poly.fits'
+residuals_cube_path = r'D:\NLC\C1\residuals_poly.fits'
 
 #getting data from existing files
 super_bias = fits.getdata(super_bias_path)  # Load super bias data
