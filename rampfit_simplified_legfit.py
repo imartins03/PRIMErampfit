@@ -10,6 +10,7 @@ calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_100im.fits'
 fit_cube_path = r'D:\NLC\C1\fit_cube_poly.fits'
+fit_cube_path_leg = r'D:\NLC\C1\fit_cube_legendre.fits'
 fit_coeff_path = r'D:\NLC\C1\fit_coeff.fits'
 residuals_cube_path = r'D:\NLC\C1\residuals.fits'
 
@@ -32,6 +33,18 @@ def evaluate_poly_array(coeffs, a_array, poly_type='power'):
             output_arrays.append(output_array)  # Append result to list
     return np.asarray(output_arrays)  # Convert list to numpy array
 
+
+# def evaluate_legendre_poly(coeffs, a_array):
+#     output_arrays = []
+#     for a in a_array:
+#         output = 0.0
+#         for n, coeff in enumerate(coeffs):
+#             output += coeff * np.polynomial.legendre.Legendre.basis(n)(a)
+#         output_arrays.append(output)
+#
+#     return np.asarray(output_arrays)
+
+
 def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     y_cube = fits.getdata(y_cube_path)  # Load y_cube data
     print(np.ndim(y_cube))
@@ -51,6 +64,8 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
 
     print(y.shape)
     time = np.arange(len(y), dtype=np.double)
+    # time = np.linspace(-1, 1, 100, dtype=np.double)  # legendre time
+
 
     # Generate array for fitting, time in units of frames
     print(time)
@@ -58,7 +73,10 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     coefficients, _ = np.polyfit(time, y, degrees, cov=True)  # Fit polynomial
     # coefficients[:, sat_pix.sum(axis=0) > 0] = np.nan
 
+    # coefficients = np.polynomial.legendre.legfit(time,y,degrees)
+
     print(coefficients.shape)
+    # np.arange(-1, 1, 2/100+1)
 
     fit_coeff = coefficients.reshape(degrees + 1, 4088, 4088)  # Reshape coefficients
     fits.writeto(fit_coeff_path, fit_coeff, overwrite=True)  # Save coefficients
