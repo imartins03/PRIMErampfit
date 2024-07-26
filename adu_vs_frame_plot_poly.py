@@ -2,6 +2,7 @@ from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import pandas as pd
 
 # Directory where the data files are stored
 data_directory = r'D:\NLC\C1\dif_degrees_test'
@@ -79,11 +80,20 @@ for degree in range(1, 11):
         median_values.append(median_value)
 
     # Plot the median values as a function of frame number
+    df = pd.read_csv(r'D:\NLC\C1\frame_statistics_poly_10deg.csv')
+
+    err_bar = df['Error'].values
+
     plt.figure()
-    plt.plot(np.arange(len(median_values)), median_values, marker='o', linestyle='-', color='black')
-    plt.title(f'Median of 256x256 whole image ({degree} deg fit) from Center as a Function of Frame Number (poly)')
+
+    x_values = np.arange(len(median_values))  # Create x-values for frames
+    plt.errorbar(x_values, median_values, yerr=err_bar, fmt='o', linestyle='-', color='black')
+
+    plt.title(f'Median of whole image ({degree} deg fit) from Center as a Function of Frame Number (poly)')
     plt.xlabel('Frame Number')
-    plt.ylabel('Median Value of 256x256 superpixel')
+    plt.ylabel('Median Value of image')
+    plt.xlim(0,101)
+    plt.ylim(-3,3)
     plt.grid(True)
 
     # Save the plot
