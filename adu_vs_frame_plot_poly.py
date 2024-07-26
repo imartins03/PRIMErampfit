@@ -155,7 +155,7 @@ for degree in range(1, 11):
     plt.figure()
 
     x_values = np.arange(len(median_values))  # Create x-values for frames
-    plt.errorbar(x_values, median_values, yerr=err_bar, fmt='o', linestyle='-', color='black')
+    plt.errorbar(x_values, median_values, yerr=err_bar, fmt='o', ecolor = 'red', linestyle='-', color='black')
 
     if degree <= 2:
         plt.xlim(-.5, 101)
