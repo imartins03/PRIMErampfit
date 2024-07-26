@@ -45,7 +45,7 @@ for i in range(res.shape[0]):
         rms_vals.append(np.sqrt(np.mean(data ** 2)))  # Calculate RMS of residuals
         median_vals.append(np.median(data))  # Calculate median
         std_vals.append(np.std(data))  # Calculate std of residuals
-        error.append((np.sqrt(np.mean(data ** 2)))/np.sqrt(len(data)))
+        error.append(np.mean((np.sqrt(np.mean(data ** 2))))/np.sqrt(len(data)))
         frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
 table = pd.DataFrame({'Mean': means, 'RMS': rms_vals, 'Median': median_vals, 'StdDev': std_vals,'Error': error})
