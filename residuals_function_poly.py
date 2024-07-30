@@ -53,6 +53,25 @@ table.to_csv(r'D:\NLC\C1\frame_statistics_poly.csv', index=False)  # Save statis
 
 df = pd.read_csv(r'D:\NLC\C1\frame_statistics_poly.csv')
 
+df = pd.read_csv(r'D:\NLC\C1\frame_statistics_poly.csv')
+
+# Calculate the total sum of RMS values
+total_rms_sum = np.sum(df['RMS'])
+
+# Calculate the length of the data (number of frames)
+length_of_data = len(df)
+
+# Calculate the divisor as the square root of the length of data minus one
+divisor = np.sqrt(length_of_data - 1)
+
+# Add a new column for the total RMS divided by the divisor
+df['TotalRMS'] = total_rms_sum
+df['TotalRMSDivided'] = df['TotalRMS'] / divisor
+
+# Save the updated DataFrame back to CSV
+df.to_csv(stat_table, index=False)
+
+
 # for i in range(res.shape[0]):
 #
 #     residuals_frame = res[i]
