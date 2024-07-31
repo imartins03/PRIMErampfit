@@ -1,7 +1,6 @@
 from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
 # Paths
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
@@ -54,8 +53,9 @@ def generate_fit_cube(center, degrees, saturation=50000):
     # Perform polynomial fitting
     coefficients, _ = np.polyfit(time, y, degrees, cov=True)
     fit_coeff = coefficients.reshape(degrees + 1, region[1] - region[0], region[3] - region[2]) #region[1]-region[0] in this case will be 256 because thats the size of the superpixel (degrees+1,256,256)
-    center_str = f"{center[0]}_{center[1]}"
-    fits.writeto(fit_coeff_path + f'center_{center_str}_{degrees}_noframe1.fits', fit_coeff, overwrite=True)
+    center_str = f"{center[1]}_{center[0]}"
+    fits.writeto(fit_coeff_path + f'center_{center_str}_{degrees}deg_noframe1.fits', fit_coeff, overwrite=True)
+    print('center_str:', center_str)
 
     fit_cube = evaluate_poly_array(np.flip(coefficients, axis=0), time)
     fit_cube = fit_cube.reshape(len(time), region[1] - region[0], region[3] - region[2])
@@ -63,48 +63,44 @@ def generate_fit_cube(center, degrees, saturation=50000):
 
     return fit_cube
 
-def process_superpixels(centers, size=256, degrees=1):
-    fit_results = {}
+def process_superpixels(centers, size=256, degrees=1):  #this function is used so I can make a loop to do all 3 regions at once
+    half_size = size // 2
+
+    # Define regions
+    regions = []
     for center in centers:
-        fit_cube = generate_fit_cube(center, degrees)
-        center_str = f"{center[0]}_{center[1]}"
-        fit_results[f'Center_{center_str}'] = fit_cube
-        print(f'fit_cube for center {center}:', fit_cube)
+        y_start = center[0] - half_size
+        y_end = center[0] + half_size
+        x_start = center[1] - half_size
+        x_end = center[1] + half_size
+        regions.append((y_start, y_end, x_start, x_end))
+
+    fit_results = {}
+    for i, region in enumerate(regions):
+        fit_cube = generate_fit_cube(region, degrees)
+        fit_results[f'Region_{i}'] = fit_cube #this just makes it easier to see the results as variables for each region, basically makes a dictionary fit results that stores the values for each region
+        print('fit_cube',fit_cube)
 
     return fit_results
 
 
 #I just did this to give me a visual representation of where the centers of the three superpixels are
 def plot_superpixels_centers(image_size, centers, size=256):
-    fig, ax = plt.subplots()
-    ax.imshow(np.zeros(image_size), cmap='gray', origin='lower')
+    plt.imshow(np.zeros(image_size), cmap='gray', origin='lower')
 
-    half_size = size // 2
-
-    # Plot centers as dots and squares
+    # Plot centers as dots
     for center in centers:
-        # Plot the center point
-        ax.plot(center[1], center[0], 'ro', markersize=10)  # Red dots for centers
+        plt.plot(center[1], center[0], 'ro', markersize=10)  # Red dots for centers
 
-        # Define the square's position
-        rect = patches.Rectangle(
-            (center[1] - half_size, center[0] - half_size),  # Bottom-left corner
-            size,  # Width
-            size,  # Height
-            linewidth=1,  # Line width
-            edgecolor='r',  # Edge color
-            facecolor='none'  # No fill color
-        )
-        # Add the rectangle to the plot
-        ax.add_patch(rect)
-
-    ax.set_title('Superpixel Centers')
-    ax.set_xlabel('X Coordinate')
-    ax.set_ylabel('Y Coordinate')
-    ax.grid(True)
+    plt.title('Superpixel Centers')
+    plt.xlabel('X Coordinate')
+    plt.ylabel('Y Coordinate')
+    plt.grid(True)
     plt.show()
 
+
 centers = [(2048, 2048), (3072,2048), (1024,2048)]  # Centers of the superpixels
+print('centers[0]:', centers[0])
 degrees = 6
 
 # Process superpixels
