@@ -15,7 +15,7 @@ maskFile = fits.getdata(maskFile_path)  # Load mask file data
 mask = maskFile > 0  # Create mask for bad pixels
 supercpy = super_bias.copy()  # Create a copy of the super bias
 supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
-
+n_frames = 100
 
 def evaluate_poly_array(coeffs, a_array, poly_type='power'):
     output_arrays = []
@@ -29,7 +29,8 @@ def evaluate_poly_array(coeffs, a_array, poly_type='power'):
 
 
 def generate_fit_cube(region, degrees, saturation=50000):
-    y_cube = fits.getdata(y_cube_path)
+    y_cube = fits.getdata(y_cube_path)[1:n_frames]   #I did this slicing so that it cuts out the first frame
+
     x,_, y, z = y_cube.shape
     # Extract the region
     y = y_cube.reshape(x, 4088, 4088)
