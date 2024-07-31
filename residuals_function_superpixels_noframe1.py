@@ -13,7 +13,7 @@ stat_table_base_path = r'D:\NLC\C1\frame_statistics_'
 centers = [(2048, 2048), (3072, 2048), (1024, 2048)]  # Centers of the superpixels
 degrees = 1
 n_frames = 100
-initial_frame_label = 1124972
+initial_frame_label = 1124973
 
 def calculate_residuals_for_superpixel(center, degrees):
     center_str = f"{center[1]}_{center[0]}"
@@ -26,8 +26,6 @@ def calculate_residuals_for_superpixel(center, degrees):
     # Load y_cube and fit_cube
     y_cube = fits.getdata(y_cube_path)[1:n_frames]  # Load y_cube data
     y_cube = y_cube[:, 0, :, :]  # Remove the second dimension
-    fit_cube = fits.getdata(fit_cube_path)[:n_frames]  # Load fit cube data
-    print(np.shape(y_cube),np.shape(fit_cube))
 
 
     # Define region
@@ -40,6 +38,7 @@ def calculate_residuals_for_superpixel(center, degrees):
     # Slice y_cube and fit_cube to superpixel region
     y_cube = y_cube[:, y_start:y_end, x_start:x_end]
     fit_cube = fits.getdata(fit_cube_path)[:n_frames]
+    print(np.shape(y_cube), np.shape(fit_cube))
 
     # Calculate residuals
     residuals_cube = y_cube - fit_cube
