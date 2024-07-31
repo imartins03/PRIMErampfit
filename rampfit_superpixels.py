@@ -59,7 +59,7 @@ def generate_fit_cube(center, degrees, saturation=50000):
     print(f"Center string: {center_str}")
 
     coeff_filename = f"{fit_coeff_path}center_{center_str}_{degrees}deg_noframe1.fits"
-    fit_cube_filename = f"{fit_cube_base_path}center_{center_str}_{degrees}_noframe1.fits"
+    fit_cube_filename = f"{fit_cube_base_path}center_{center_str}_{degrees}deg_noframe1.fits"
 
     # Debug the filenames
     print(f"Coefficient file: {coeff_filename}")
@@ -93,6 +93,7 @@ def process_superpixels(centers, size=256, degrees=1):
         fit_cube = generate_fit_cube(centers[i], degrees)  # Ensure correct center is passed
         fit_results[f'Region_{i}'] = fit_cube
         print('fit_cube', fit_cube)
+        print(np.shape(fit_cube))
 
     return fit_results
 
