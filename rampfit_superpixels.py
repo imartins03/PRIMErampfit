@@ -38,7 +38,7 @@ def generate_fit_cube(center, degrees, saturation=50000):
     x_end = center[1] + half_size
     region = (y_start, y_end, x_start, x_end)
 
-    y_cube = fits.getdata(y_cube_path)[1:n_frames]  # Assuming y_cube_path is correct
+    y_cube = fits.getdata(y_cube_path)[1:n_frames]
 
     x, _, y, z = y_cube.shape
     y = y_cube.reshape(x, 4088, 4088)
@@ -95,8 +95,6 @@ def process_superpixels(centers, size=256, degrees=1):
         print('fit_cube', fit_cube)
 
     return fit_results
-
-
 
 #this is just for my visualization purposes
 def plot_superpixels_centers(image_size, centers, size=256):
