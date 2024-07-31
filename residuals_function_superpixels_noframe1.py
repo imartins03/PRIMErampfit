@@ -4,27 +4,31 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Paths
-y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
-fit_cube_base_path = r'D:\NLC\C1\fit_cube_region_'
-residuals_cube_base_path = r'D:\NLC\C1\residuals_region_'
-stat_table_base_path = r'D:\NLC\C1\frame_statistics_region_'
+y_cube_path = r'D:\NLC\C1\y_cube_4.fits'
+fit_cube_base_path = r'D:\NLC\C1\fit_cube_'
+residuals_cube_base_path = r'D:\NLC\C1\residuals_'
+stat_table_base_path = r'D:\NLC\C1\frame_statistics_'
 
 # Superpixel centers and parameters
 centers = [(2048, 2048), (3072, 2048), (1024, 2048)]  # Centers of the superpixels
-degrees = 6
+degrees = 1
 n_frames = 100
 initial_frame_label = 1124972
 
 def calculate_residuals_for_superpixel(center, degrees):
-    center_str = f"{center[0]}_{center[1]}"
-    fit_cube_path = fit_cube_base_path + f'center_{center_str}_{degrees}_noframe1.fits'
-    residuals_cube_path = residuals_cube_base_path + f'center_{center_str}_{degrees}_noframe1.fits'
-    stat_table_path = stat_table_base_path + f'center_{center_str}_{degrees}_noframe1.csv'
+    center_str = f"{center[1]}_{center[0]}"
+    fit_cube_path = fit_cube_base_path + f'center_{center_str}_{degrees}deg_noframe1.fits'
+    residuals_cube_path = residuals_cube_base_path + f'center_{center_str}_{degrees}deg_noframe1.fits'
+    stat_table_path = stat_table_base_path + f'center_{center_str}_{degrees}deg_noframe1.csv'
+
+    # "D:\NLC\C1\fit_cube_center_2048_2048_1deg_noframe1.fits"
 
     # Load y_cube and fit_cube
-    y_cube = fits.getdata(y_cube_path)[:n_frames]  # Load y_cube data
+    y_cube = fits.getdata(y_cube_path)[1:n_frames]  # Load y_cube data
     y_cube = y_cube[:, 0, :, :]  # Remove the second dimension
     fit_cube = fits.getdata(fit_cube_path)[:n_frames]  # Load fit cube data
+    print(np.shape(y_cube),np.shape(fit_cube))
+
 
     # Define region
     half_size = 128  # Size for superpixel
@@ -35,7 +39,7 @@ def calculate_residuals_for_superpixel(center, degrees):
 
     # Slice y_cube and fit_cube to superpixel region
     y_cube = y_cube[:, y_start:y_end, x_start:x_end]
-    fit_cube = fit_cube[:, y_start:y_end, x_start:x_end]
+    fit_cube = fits.getdata(fit_cube_path)[:n_frames]
 
     # Calculate residuals
     residuals_cube = y_cube - fit_cube
