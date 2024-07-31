@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 # Paths
 y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
-fit_cube_base_path = r'D:\NLC\C1\fit_cube_'
-residuals_cube_base_path = r'D:\NLC\C1\residuals_'
-stat_table_base_path = r'D:\NLC\C1\frame_statistics_'
+fit_cube_base_path = r'D:\NLC\C1\superpix\fit_cube_'
+residuals_cube_base_path = r'D:\NLC\C1\superpix\residuals_'
+stat_table_base_path = r'D:\NLC\C1\superpix\frame_statistics_'
 
 # Superpixel centers and parameters
 centers = [(2048, 2048), (3072, 2048), (500, 2048)]  # Centers of the superpixels
