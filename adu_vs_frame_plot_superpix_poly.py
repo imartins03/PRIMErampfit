@@ -146,23 +146,19 @@ data_directory = r'D:\NLC\C1\dif_degrees_test'
 # import pandas as pd
 
 # Directory where the data files are stored
-data_directory = r'D:\NLC\C1\dif_degrees_test'
+data_directory = r'D:\NLC\C1'
 
 # Superpixel centers
-superpixel_centers = [(2048, 2048), (3072, 2048), (1024, 2048)]  # Replace with your superpixel centers
+superpixel_centers = [(2048, 2048), (3072, 2048), (500, 2048)]  # Replace with your superpixel centers
 
 # Initialize lists to store median values and frame numbers
 median_values_all_deg = []
 
 # Loop over all degrees
-for degree in range(1, 12):  # Assuming you want 11 degrees
+for degree in range(6, 6):  # Assuming you want 11 degrees
     for center in superpixel_centers:
         # Construct the file path for residuals data
-        residuals_cube_path = os.path.join(data_directory, f'residuals_poly_{degree}deg_center_{center[0]}_{center[1]}.fits')
-
-        if not os.path.exists(residuals_cube_path):
-            print(f"File not found: {residuals_cube_path}")
-            continue
+        residuals_cube_path = os.path.join(data_directory, f'residuals_center_{center[0]}_{center[1]}_{degree}deg-noframe1.fits')
 
         # Load the data
         y = fits.getdata(residuals_cube_path)
@@ -210,18 +206,12 @@ for degree in range(1, 12):  # Assuming you want 11 degrees
         plt.ylabel('Median Value of 256x256 Superpixels')
         plt.legend()
         plt.grid(True)
+        plt.show()
 
         # Save the plot
         plot_filename = os.path.join(data_directory, f'median_superpix_plot_poly_{degree}deg_center_{center[0]}_{center[1]}.png')
         plt.savefig(plot_filename)
         plt.show()
-        plt.close()  # Close the figure to release memory
+        # plt.close()  # Close the figure to release memory
 
-        # Append median values for this degree and center to the list
-        median_values_all_deg.append({
-            'degree': degree,
-            'center': center,
-            'median_center': median_values_center,
-            'median_above': median_values_above,
-            'median_below': median_values_below
-        })
+

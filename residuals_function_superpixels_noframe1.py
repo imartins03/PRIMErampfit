@@ -4,14 +4,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 #chan
 # Paths
-y_cube_path = r'D:\NLC\C1\y_cube_4.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
 fit_cube_base_path = r'D:\NLC\C1\fit_cube_'
 residuals_cube_base_path = r'D:\NLC\C1\residuals_'
 stat_table_base_path = r'D:\NLC\C1\frame_statistics_'
 
 # Superpixel centers and parameters
-centers = [(2048, 2048), (3072, 2048), (1024, 2048)]  # Centers of the superpixels
-degrees = 1
+centers = [(2048, 2048), (3072, 2048), (500, 2048)]  # Centers of the superpixels
+degrees = 6
 n_frames = 100
 initial_frame_label = 1124973
 

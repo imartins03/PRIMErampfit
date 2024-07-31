@@ -6,7 +6,7 @@ import matplotlib.patches as patches
 # Paths
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_4.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
 fit_cube_base_path = r'D:\NLC\C1\fit_cube_'
 fit_coeff_path = r'D:\NLC\C1\fit_coeff_'
 
@@ -75,7 +75,7 @@ def generate_fit_cube(center, degrees, saturation=50000):
     return fit_cube
 
 
-def process_superpixels(centers, size=256, degrees=1):
+def process_superpixels(centers, size=256, degrees=6):
     half_size = size // 2
 
     # Define regions
@@ -126,8 +126,8 @@ def plot_superpixels_centers(image_size, centers, size=256):
     plt.show()
 
 
-centers = [(2048, 2048), (3072, 2048), (1024, 2048)]  # Centers of the superpixels
-degrees = 1
+centers = [(2048, 2048), (3072, 2048), (500, 2048)]  # Centers of the superpixels
+degrees = 6
 
 # Process superpixels
 fit_results = process_superpixels(centers, size=256, degrees=degrees)
