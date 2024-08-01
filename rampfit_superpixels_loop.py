@@ -7,8 +7,8 @@ import matplotlib.patches as patches
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
-fit_cube_base_path = r'D:\NLC\C1\fit_cube_'
-fit_coeff_path = r'D:\NLC\C1\fit_coeff_'
+fit_cube_base_path = r'D:\NLC\C1\superpix\fit_cube_'
+fit_coeff_path = r'D:\NLC\C1\superpix\fit_coeff_'
 
 # Load data
 super_bias = fits.getdata(super_bias_path)  # Load super bias data
@@ -110,7 +110,7 @@ def plot_superpixels_centers(image_size, centers, size=256):
 
         # Annotate the center with its coordinates
         ax.text(center[1] + half_size + 10, center[0] + half_size + 10,
-                f'({center[1]}, {center[0]})', color='white', fontsize=8,
+                f'({center[1]}, {center[0]})', color='white', fontsize=12,
                 verticalalignment='bottom', horizontalalignment='left')
 
         # Define the rectangle
@@ -129,7 +129,7 @@ def plot_superpixels_centers(image_size, centers, size=256):
     plt.show()
 
 centers = [(2048, 2048), (3072, 2048), (500, 2048)]  # Centers of the superpixels
-degrees_range = (1, 10)  # Range of degrees
+degrees_range = (1, 10)
 
 # Process superpixels
 fit_results = process_superpixels(centers, size=256, degrees_range=degrees_range)
