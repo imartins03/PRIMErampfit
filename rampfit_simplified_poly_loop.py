@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+#w
 # Definition of paths
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
