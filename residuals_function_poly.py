@@ -9,10 +9,10 @@ calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
 
-fit_cube_path = r'D:\NLC\C1\dif_degrees_test\fit_cube_poly_10deg.fits'
-fit_coeff_path = r'D:\NLC\C1\dif_degrees_test\fit_coeff_poly_10deg.fits'
-residuals_cube_path = r'D:\NLC\C1\dif_degrees_test\residuals_poly_10deg.fits'
-stat_table = r'D:\NLC\C1\dif_degrees_test\frame_statistics_poly_10deg.csv'
+fit_cube_path = r'D:\NLC\C1\dif_degrees_test\fit_cube_poly_8deg.fits'
+fit_coeff_path = r'D:\NLC\C1\dif_degrees_test\fit_coeff_poly_8deg.fits'
+residuals_cube_path = r'D:\NLC\C1\dif_degrees_test\residuals_poly_8deg.fits'
+stat_table = r'D:\NLC\C1\dif_degrees_test\frame_statistics_poly_8deg.csv'
 
 n_frames = 100
 
@@ -34,7 +34,7 @@ means = []
 rms_vals = []
 median_vals = []
 std_vals = []
-error = [] #rms/sqrt(n_frames)
+error = [] #mean(rms)/sqrt(n_frames)
 
 res = fits.getdata(residuals_cube_path)
 
@@ -49,9 +49,9 @@ for i in range(res.shape[0]):
         frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
 table = pd.DataFrame({'Mean': means, 'RMS': rms_vals, 'Median': median_vals, 'StdDev': std_vals,'Error': error})
-table.to_csv(r'D:\NLC\C1\frame_statistics_poly_10deg.csv', index=False)  # Save statistics to CSV
+table.to_csv(r'D:\NLC\C1\frame_statistics_poly_8deg.csv', index=False)  # Save statistics to CSV
 
-df = pd.read_csv(r'D:\NLC\C1\frame_statistics_poly_10deg.csv')
+df = pd.read_csv(r'D:\NLC\C1\frame_statistics_poly_8deg.csv')
 
 df = pd.read_csv(r'D:\NLC\C1\frame_statistics_poly.csv')
 
