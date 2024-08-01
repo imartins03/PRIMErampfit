@@ -108,6 +108,11 @@ def plot_superpixels_centers(image_size, centers, size=256):
         # Plot center as a red dot
         ax.plot(center[1], center[0], 'ro', markersize=10)  # Red dots for centers
 
+        # Annotate the center with its coordinates
+        ax.text(center[1] + half_size + 10, center[0] + half_size + 10,
+                f'({center[1]}, {center[0]})', color='white', fontsize=8,
+                verticalalignment='bottom', horizontalalignment='left')
+
         # Define the rectangle
         rect = patches.Rectangle(
             (center[1] - half_size, center[0] - half_size),
