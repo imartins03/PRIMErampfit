@@ -4,18 +4,14 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 
-# Directory where the data files are stored
 data_directory = r'D:\NLC\C1\superpix'
 
-# List of superpixel centers (example centers, replace with your actual centers)
 superpixel_centers = [(2048, 2048), (3072, 2048), (500, 2048)]  # Add more centers if needed
-
-# Initialize lists to store median values
 median_values_all_deg = []
 
 # Loop over all degrees
 for degree in range(1, 11):  # Assuming 10 degrees
-    # Initialize a dictionary to store median values for each superpixel
+    #store median values for each superpixel
     median_values_dict = {center: [] for center in superpixel_centers}
 
     # Loop over all superpixels
@@ -29,20 +25,14 @@ for degree in range(1, 11):  # Assuming 10 degrees
         superpix_size = 256
         half_size = superpix_size // 2
 
-        # Define the vertical distance for the above and below superpixels
-        vertical_distance = half_size // 2
-
         # Iterate over each frame
         for frame_n in range(y.shape[0]):
             frame = y[frame_n]
 
-            # Extract 256x256 square from the superpixel center
+            #Extract 256x256 square from the superpixel center, same as previous code
             superpix = frame[center_x - half_size:center_x + half_size, center_y - half_size:center_y + half_size]
 
-            # Compute median value for this superpixel
             median_value = np.median(superpix)
-
-            # Append median value to the list
             median_values_dict[center].append(median_value)
 
     # Plot the median values as a function of frame number
