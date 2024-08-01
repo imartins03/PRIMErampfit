@@ -9,9 +9,9 @@ super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
-fit_cube_path = r'D:\NLC\C1\fit_cube_leg.fits'
-fit_coeff_path = r'D:\NLC\C1\fit_coeff_leg.fits'
-residuals_cube_path = r'D:\NLC\C1\residuals_leg.fits'
+fit_cube_path = r'D:\NLC\C1\fit_cube_leg_10deg.fits'
+fit_coeff_path = r'D:\NLC\C1\fit_coeff_leg_10deg.fits'
+residuals_cube_path = r'D:\NLC\C1\residuals_leg_10deg.fits'
 
 #getting data from existing files
 super_bias = fits.getdata(super_bias_path)  # Load super bias data
@@ -86,6 +86,6 @@ def generate_fit_cube(frame_num, degrees, saturation=50000, n_frames=None):
     return fit_cube
 
 saturation = 50000 #currently not used
-degrees = 6
+degrees = 10
 generate_fit_cube(np.linspace(1, 100, 100), degrees, saturation)  # Generate fit cube
 
