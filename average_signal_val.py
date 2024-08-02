@@ -132,5 +132,30 @@ plt.grid(True)
 plt.savefig(r'D:\NLC\C1\average_adu_per_frame.png')  # Save the plot as an image file
 plt.show()
 
+saturation_val = 50000
+y_cube = fits.getdata(y_cube_path)
+print(y_cube.shape)
+y = y_cube[:,0,:,:]
+
+def percentage_saturation_val():
+    percentages = []
+
+    for i in range(y.shape[0]):
+        frame_data = y[i]
+
+        pix_over_saturation = np.sum(frame_data > saturation_val)
+
+        # Calculate the total number of pixels
+        total_pixels = 4088*4088
+
+        # Calculate the percentage of saturated pixels
+        percentage_pix_over_saturation = (pix_over_saturation/total_pixels)*100
+        percentages.append(percentage_pix_over_saturation)
+        print(f"Frame {i}: {percentage_pix_over_saturation:.2f}%")
+
+    return percentages
+
+percentages = percentage_saturation_val()
+
 
 
