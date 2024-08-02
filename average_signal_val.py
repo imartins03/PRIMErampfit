@@ -38,25 +38,48 @@ maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 # print(f'Statistics table saved to {stat_table_path}')
 
 #%%
-# y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
-stat_table_path_raw = r'D:\NLC\C1\avg_signal_raw_frames.csv'
 
+from astropy.io import fits
+import numpy as np
+import pandas as pd
+
+stat_table_path_raw = r'D:\NLC\C1\avg_signal_raw_frames.csv'
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
-frame_range = (1124972, 1124972 + 100)
-file_list = [file_format.format(n) for n in range(*frame_range)]
+frame_start = 1124972
+frame_count = 100
+file_list = [file_format.format(frame_start+i) for i in range(frame_count)] #method from before did not work, was doing 40000 frames
 
 def compute_statistics(file_list, initial_frame_label):
     means = []
     frame_num = []
 
+    # Iterate over each file
     for file_path in file_list:
-        data = fits.getdata(file_path)
-        for i in range(data.shape[0]):
+        try:
+            # Read data from the FITS file
+            data = fits.getdata(file_path)
+        except FileNotFoundError:
+            print(f"File not found: {file_path}")
+            continue
+
+        # Check the number of frames in the file and ensure we're processing only up to the limit
+        num_frames = data.shape[0]
+
+        # Process frames up to the frame_count
+        for i in range(min(num_frames, frame_count)):
             frame_data = data[i]
             means.append(np.mean(frame_data))  # Calculate mean
             frame_num.append(initial_frame_label)
             initial_frame_label += 1  # Increment frame label for each new frame
 
+            # Stop processing if we have reached the desired frame_count
+            if len(means) >= frame_count:
+                break
+
+        if len(means) >= frame_count:
+            break
+
+    # Create a DataFrame to store the results
     table = pd.DataFrame({
         'FrameNumber': frame_num,
         'Average Signal': means,
@@ -64,7 +87,13 @@ def compute_statistics(file_list, initial_frame_label):
 
     return table
 
-initial_frame_label = 1124972
+
+# Initial frame label for the processing
+initial_frame_label = frame_start
 statistics_df = compute_statistics(file_list, initial_frame_label)
 
+# Save the DataFrame to a CSV file
 statistics_df.to_csv(stat_table_path_raw, index=False)
+
+print(f'Statistics table saved to {stat_table_path_raw}')
+
