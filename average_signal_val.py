@@ -55,12 +55,9 @@ def compute_statistics(file_list, initial_frame_label):
 
     # Iterate over each file
     for file_path in file_list:
-        try:
-            # Read data from the FITS file
-            data = fits.getdata(file_path)
-        except FileNotFoundError:
-            print(f"File not found: {file_path}")
-            continue
+        # Read data from the FITS file
+        data = fits.getdata(file_path)
+
 
         # Check the number of frames in the file and ensure we're processing only up to the limit
         num_frames = data.shape[0]
@@ -96,4 +93,7 @@ statistics_df = compute_statistics(file_list, initial_frame_label)
 statistics_df.to_csv(stat_table_path_raw, index=False)
 
 print(f'Statistics table saved to {stat_table_path_raw}')
+
+
+
 
