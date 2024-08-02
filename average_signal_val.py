@@ -105,7 +105,7 @@ y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
 def compute_statistics(y_cube_path, initial_frame_label):
     means = []
     frame_num = []
-
+#
     # Read data from the FITS file
     y_cube = fits.getdata(y_cube_path)
 
