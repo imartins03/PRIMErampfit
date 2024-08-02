@@ -19,7 +19,7 @@ supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
 n_frames = 100
 
 def generate_fit_cube(degrees, centers):
-    y_cube = fits.getdata(y_cube_path)[1:n_frames]
+    y_cube = fits.getdata(y_cube_path)[5:n_frames]
     x, _, y, z = y_cube.shape
     # y = y_cube.reshape(x, 4088, 4088)
     y_cube = y_cube[:,0,:,:]
@@ -49,13 +49,13 @@ def generate_fit_cube(degrees, centers):
             print(f'Center {center} Degree {degree}')
 
 
-        plt.title(f'Residuals vs. Frame Number for Degree {degree}')
+        plt.title(f'Residuals vs. Frame Number for Degree {degree}, Skip 5')
         plt.xlabel('Frame Number')
         plt.ylabel('Residuals')
         plt.legend()
         plt.grid(True)
 
-        plot_filename = os.path.join(data_directory, f'median_superpix_plot_poly_{degree}deg.png')
+        plot_filename = os.path.join(data_directory, f'median_superpix_plot_poly_{degree}deg_skip5frames.png')
         plt.savefig(plot_filename)
 
         plt.show()
