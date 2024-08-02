@@ -5,13 +5,13 @@ from irrc.util import destripe
 import matplotlib.pyplot as plt
 
 file_format = r'D:\NLC\C1\{0:08d}C1.fits.fz'
-r = (1124972, 1124972+100)
+r = (1124972, 1124972+500)
 file_list = [file_format.format(n) for n in range(*r)]  # Generate list of file paths using the specified range
 full_file_list = file_list
 super_bias_path = 'IRRC_calfiles/super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles/C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
 
 super_bias = fits.getdata(super_bias_path)  # Load super bias data
 maskFile = fits.getdata(maskFile_path)  # Load mask file data
