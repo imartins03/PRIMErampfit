@@ -8,10 +8,10 @@ import pandas as pd
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
-fit_cube_path_template = r'D:\NLC\C1\dif_degrees_test\fit_cube_poly_{degree}deg_noframe1.fits'
-fit_coeff_path_template = r'D:\NLC\C1\dif_degrees_test\fit_coeff_poly_{degree}deg_noframe1.fits'
-residuals_cube_path_template = r'D:\NLC\C1\dif_degrees_test\residuals_poly_{degree}deg_noframe1.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
+fit_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fit_cube_poly_{degree}deg_239frames_noframe1.fits'
+fit_coeff_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fit_coeff_poly_{degree}deg_239frames_noframe1.fits'
+residuals_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\residuals_poly_{degree}deg_239frames_noframe1.fits'
 
 # Getting data from existing files
 super_bias = fits.getdata(super_bias_path)  # Load super bias data
@@ -31,7 +31,7 @@ def evaluate_poly_array(coeffs, a_array, poly_type='power'):
             output_arrays.append(output_array)  # Append result to list
     return np.asarray(output_arrays)  # Convert list to numpy array
 
-def generate_fit_cube(degree, saturation=50000, n_frames=100):
+def generate_fit_cube(degree, saturation=50000, n_frames=239):
     y_cube = fits.getdata(y_cube_path)  # Load y_cube data
     x = y_cube.shape[0]  # x is the dimension of the data cube (number of frames)
 

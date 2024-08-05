@@ -104,7 +104,7 @@ def val(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 4092)), degree
     coeff_data = fits.getdata(coeff_data_file)
     x = np.arange(len(frame_list))
     fit_coeff = coeff_data.reshape(2, 4088*4088)
-    val_fit = evaluate_poly_array(np.flip(fit_coeff, axis=0), x, poly_type = 'legendre')
+    val_fit = evaluate_poly_array(np.flip(fit_coeff, axis=0), x, poly_type = 'power')
     return val_fit.reshape(len(frame_list), 4088, 4088)
 
 def residuals(frame_list, superbias, calFile, mask, slc=((4, 4092), (4, 4092)), degrees=1, saturation=50000):

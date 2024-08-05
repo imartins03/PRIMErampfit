@@ -58,8 +58,8 @@ def generate_fit_cube(center, degrees, saturation=50000):
     center_str = f"{center[1]}_{center[0]}"
     print(f"Center string: {center_str}")
 
-    coeff_filename = f"{fit_coeff_path}center_{center_str}_{degrees}deg_noframe1.fits"
-    fit_cube_filename = f"{fit_cube_base_path}center_{center_str}_{degrees}deg_noframe1.fits"
+    coeff_filename = f"{fit_coeff_path}center_{center_str}_{degrees}deg_{n_frames}frames_noframe1.fits"
+    fit_cube_filename = f"{fit_cube_base_path}center_{center_str}_{degrees}deg_{n_frames}frames_noframe1.fits"
 
     # Debug the filenames
     print(f"Coefficient file: {coeff_filename}")

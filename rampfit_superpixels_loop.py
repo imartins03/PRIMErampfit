@@ -2,13 +2,15 @@ from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import os
 
 # Paths
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
-fit_cube_base_path = r'D:\NLC\C1\superpix\fit_cube_'
-fit_coeff_path = r'D:\NLC\C1\superpix\fit_coeff_'
+fit_cube_base_path = r'fit_cube_'
+fit_coeff_path = r'fit_coeff_'
+data_directory = r'D:\NLC\C1\superpix\pixel_by_pixel_superpix'
 
 # Load data
 super_bias = fits.getdata(super_bias_path)  # Load super bias data
@@ -16,7 +18,7 @@ maskFile = fits.getdata(maskFile_path)  # Load mask file data
 mask = maskFile > 0  # Create mask for bad pixels
 supercpy = super_bias.copy()  # Create a copy of the super bias
 supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
-n_frames = 100
+n_frames = 239
 
 def evaluate_poly_array(coeffs, a_array, poly_type='power'):
     output_arrays = []
@@ -56,8 +58,8 @@ def generate_fit_cube(center, degrees, saturation=50000):
     center_str = f"{center[1]}_{center[0]}"
     print(f"Center string: {center_str}")
 
-    coeff_filename = f"{fit_coeff_path}center_{center_str}_{degrees}deg_noframe1.fits"
-    fit_cube_filename = f"{fit_cube_base_path}center_{center_str}_{degrees}deg_noframe1.fits"
+    coeff_filename = os.path.join(data_directory,f"{fit_coeff_path}center_{center_str}_{degrees}deg{n_frames}frames_noframe1.fits")
+    fit_cube_filename = os.path.join(data_directory,f"{fit_cube_base_path}center_{center_str}_{degrees}deg{n_frames}frames_noframe1.fits")
 
     # Debug the filenames
     print(f"Coefficient file: {coeff_filename}")
