@@ -7,8 +7,12 @@ import pandas as pd
 # Paths
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
-data_directory = r'D:\NLC\C1\superpix'
+y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
+data_directory = r'D:\NLC\C1\superpix\mean_superpixel'
+fit_cube_base_path = r'D:\NLC\C1\superpix\fit_cube_avg_'
+fit_coeff_path = r'D:\NLC\C1\superpix\fit_coeff_avg_'
+residuals_base_path = r'D:\NLC\C1\superpix\residuals_avg_'
+
 #
 # Load data
 super_bias = fits.getdata(super_bias_path)  # Load super bias data
@@ -16,10 +20,10 @@ maskFile = fits.getdata(maskFile_path)  # Load mask file data
 mask = maskFile > 0  # Create mask for bad pixels
 supercpy = super_bias.copy()  # Create a copy of the super bias
 supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
-n_frames = 100
+n_frames = 239
 
 def generate_fit_cube(degrees, centers):
-    y_cube = fits.getdata(y_cube_path)[5:n_frames]
+    y_cube = fits.getdata(y_cube_path)[1:n_frames]
     x, _, y, z = y_cube.shape
     # y = y_cube.reshape(x, 4088, 4088)
     y_cube = y_cube[:,0,:,:]
@@ -43,19 +47,38 @@ def generate_fit_cube(degrees, centers):
             fit = np.polyval(coefficients, time)
             residuals = y - fit
 
+            fit_coeff = coefficients
+
             # plt.figure()
 
             plt.plot(time, residuals, label=f'Center {np.flip(center)}')
             print(f'Center {center} Degree {degree}')
 
+            # Debug the center value and filename strings
+            print(f"Center coordinates: {center}")
+            center_str = f"{center[1]}_{center[0]}"
+            print(f"Center string: {center_str}")
 
-        plt.title(f'Residuals vs. Frame Number for Degree {degree}, Skip 5')
+            coeff_filename = os.path.join(data_directory,f"{fit_coeff_path}center_{center_str}_{degree}deg_{n_frames}frames_noframe1.fits")
+            fit_cube_filename = os.path.join(data_directory,f"{fit_cube_base_path}center_{center_str}_{degree}deg_{n_frames}frames_noframe1.fits")
+
+            # Debug the filenames
+            print(f"Coefficient file: {coeff_filename}")
+            print(f"Fit cube file: {fit_cube_filename}")
+
+            residuals_filename = os.path.join(data_directory,f"{residuals_base_path}center_{center_str}_{degree}deg_{n_frames}frames_noframe1.fits")
+
+            # Save the FITS files
+            fits.writeto(coeff_filename, fit_coeff, overwrite=True)
+            fits.writeto(residuals_filename, residuals, overwrite=True)
+
+        plt.title(f'Residuals vs. Frame Number for Degree {degree}, Avg Superpixel, no frame 1')
         plt.xlabel('Frame Number')
         plt.ylabel('Residuals')
         plt.legend()
         plt.grid(True)
 
-        plot_filename = os.path.join(data_directory, f'median_superpix_plot_poly_{degree}deg_skip5frames.png')
+        plot_filename = os.path.join(data_directory, f'median_avg_superpix_plot_poly_{degree}deg_{n_frames}frames_noframe1.png')
         plt.savefig(plot_filename)
 
         plt.show()
