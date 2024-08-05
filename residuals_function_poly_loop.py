@@ -3,17 +3,19 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+n_frames = 239
+
 # Definition of paths
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
-fit_cube_path_template = r'D:\NLC\C1\dif_degrees_test\fit_cube_poly_{degree}deg_noframe1.fits'
-fit_coeff_path_template = r'D:\NLC\C1\dif_degrees_test\fit_coeff_poly_{degree}deg_noframe1.fits'
-residuals_cube_path_template = r'D:\NLC\C1\dif_degrees_test\residuals_poly_{degree}deg_noframe1.fits'
-stat_table_template = r'D:\NLC\C1\dif_degrees_test\frame_statistics_poly_{degree}deg_noframe1.csv'
+y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
+fit_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fit_cube_poly_{degree}deg_239frames_noframe1.fits'
+fit_coeff_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fit_coeff_poly_{degree}deg_239frames_noframe1.fits'
+residuals_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\residuals_poly_{degree}deg_239frames_noframe1.fits'
+stat_table_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\frame_statistics_poly_{degree}deg_239frames_noframe1.csv'
 
-n_frames = 100
+
 
 def calculate_residuals(degree):
     y_cube = fits.getdata(y_cube_path)[1:n_frames]  # Load y_cube data
@@ -40,7 +42,6 @@ def compute_statistics(residuals_cube, initial_frame_label):
         rms_vals.append(np.sqrt(np.mean(data ** 2)))  # Calculate RMS of residuals
         median_vals.append(np.median(data))  # Calculate median
         std_vals.append(np.std(data))  # Calculate std of residuals
-        error.append(np.mean(np.sqrt(np.mean(data ** 2))) / np.sqrt(len(data)))
         frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
     table = pd.DataFrame({
@@ -49,7 +50,6 @@ def compute_statistics(residuals_cube, initial_frame_label):
         'RMS': rms_vals,
         'Median': median_vals,
         'StdDev': std_vals,
-        'Error': error
     })
 
     return table
