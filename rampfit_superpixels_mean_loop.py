@@ -9,9 +9,9 @@ super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
 data_directory = r'D:\NLC\C1\superpix\mean_superpixel'
-fit_cube_base_path = r'D:\NLC\C1\superpix\fit_cube_avg_'
-fit_coeff_path = r'D:\NLC\C1\superpix\fit_coeff_avg_'
-residuals_base_path = r'D:\NLC\C1\superpix\residuals_avg_'
+fit_cube_base_path = r'fit_cube_avg_'
+fit_coeff_path = r'fit_coeff_avg_'
+residuals_base_path = r'residuals_avg_'
 
 #
 # Load data
@@ -20,7 +20,7 @@ maskFile = fits.getdata(maskFile_path)  # Load mask file data
 mask = maskFile > 0  # Create mask for bad pixels
 supercpy = super_bias.copy()  # Create a copy of the super bias
 supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
-n_frames = 239
+n_frames = 100
 
 def generate_fit_cube(degrees, centers):
     y_cube = fits.getdata(y_cube_path)[1:n_frames]
