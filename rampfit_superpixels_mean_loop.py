@@ -35,9 +35,11 @@ def generate_fit_cube(degrees, centers):
     degree_list = []
     center_list = []
     slope_list = []
-    rms_list = []
 
     time = np.arange(y_cube.shape[0], dtype=np.double)
+
+    # Create a DataFrame to store average RMS for each superpixel, degree, and center
+    avg_rms_data = []
 
     for degree in degrees:
         for center in centers:
@@ -52,21 +54,18 @@ def generate_fit_cube(degrees, centers):
             y = y.reshape(x, -1)
             y = np.mean(y, axis=1)
 
-            # Polynomial fitting and residuals
+            # Polynomial fitting
             coefficients = np.polyfit(time, y, degree)
             fit = np.polyval(coefficients, time)
-            residuals = y - fit
 
-            slope = (residuals[-1] - residuals[0]) / (time[-1] - time[0])
-
-            # RMS of the residuals
-            rms = calculate_rms(residuals)
+            # Calculate the slope of the polynomial fit
+            derivative_coefficients = np.polyder(coefficients)
+            slope_at_end = np.polyval(derivative_coefficients, time[-1])
 
             # Append results to lists
             degree_list.append(degree)
             center_list.append(np.flip(center))
-            slope_list.append(slope)
-            rms_list.append(rms)
+            slope_list.append(slope_at_end)  # Store slope of polynomial fit
 
             # Create the center_str for file naming
             center_str = f"{center[1]}_{center[0]}"
@@ -77,7 +76,20 @@ def generate_fit_cube(degrees, centers):
                                               f"{residuals_base_path}center_{center_str}_{degree}deg_{n_frames}frames_noframe1.fits")
 
             fits.writeto(coeff_filename, coefficients, overwrite=True)
+            residuals = y - fit
             fits.writeto(residuals_filename, residuals, overwrite=True)
+
+            # Calculate average RMS for the residuals over frames
+            residuals_cube = fits.getdata(residuals_filename)
+            rms_values = [calculate_rms(frame) for frame in residuals_cube]
+            avg_rms = np.sum(rms_values) / np.sqrt(len(rms_values) - 1)
+            print(len(rms_values))
+
+            avg_rms_data.append({
+                'Degree': degree,
+                'Center': np.flip(center),
+                'RMS of the Average': avg_rms
+            })
 
         # Plot the residuals
         plt.figure()
@@ -100,54 +112,42 @@ def generate_fit_cube(degrees, centers):
         plt.show()
         plt.close()
 
-    # Create the results DataFrame
+    # Create the main results DataFrame (without RMS)
     results_df = pd.DataFrame({
         'Degree': degree_list,
         'Center': center_list,
-        'Slope': slope_list,
-        'RMS': rms_list
+        'Slope': slope_list
     })
 
-    # Save the results to a CSV file
+    # Save the main results DataFrame to a CSV file
     csv_filename = os.path.join(data_directory, 'results_vs_degree_trial.csv')
+    try:
+        results_df.to_csv(csv_filename, index=True)
+        print(f"Main results saved to {csv_filename}")
+    except Exception as e:
+        print(f"Error saving main results: {e}")
+
+    # Create the average RMS DataFrame
+    avg_rms_df = pd.DataFrame(avg_rms_data)
+
+    # Save the average RMS DataFrame to a CSV file
+    avg_rms_csv_filename = os.path.join(data_directory, 'average_rms_vs_degree_and_center.csv')
+    try:
+        avg_rms_df.to_csv(avg_rms_csv_filename, index=True)
+        print(f"Average RMS results saved to {avg_rms_csv_filename}")
+    except Exception as e:
+        print(f"Error saving average RMS results: {e}")
+
+    # Print both DataFrames
+    print("Main Results DataFrame:")
+    print(results_df)
+    print("Average RMS DataFrame:")
+    print(avg_rms_df)
+
     results_df.to_csv(csv_filename, index=True)
     print(f"Results saved to {csv_filename}")
 
     print(results_df)
-
-
-def plot_superpixels_centers(image_size, centers, size=256):
-    fig, ax = plt.subplots()
-
-    # Create an empty image
-    ax.imshow(np.zeros(image_size), cmap='gray', origin='lower')
-
-    # Plot centers as dots and rectangles
-    half_size = size // 2
-    for center in centers:
-        # Plot center as a red dot
-        ax.plot(center[1], center[0], 'ro', markersize=10)  # Red dots for centers
-
-        # Annotate the center with its coordinates
-        ax.text(center[1] + half_size + 10, center[0] + half_size + 10,
-                f'({center[1]}, {center[0]})', color='white', fontsize=12,
-                verticalalignment='bottom', horizontalalignment='left')
-
-        # Define the rectangle
-        rect = patches.Rectangle(
-            (center[1] - half_size, center[0] - half_size),
-            size, size,
-            linewidth=1, edgecolor='r', facecolor='none'
-        )
-        # Add the rectangle to the plot
-        ax.add_patch(rect)
-
-    ax.set_title('Superpixel Centers')
-    ax.set_xlabel('X Coordinate')
-    ax.set_ylabel('Y Coordinate')
-    ax.grid(True)
-    plt.show()
-
 
 # Parameters
 centers = [(500, 2048), (2048, 2048), (3500, 2048)]  # Centers of the superpixels
