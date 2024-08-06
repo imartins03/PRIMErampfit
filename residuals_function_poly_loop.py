@@ -1,11 +1,9 @@
-from astropy.io import fits
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from astropy.io import fits
 
-n_frames = 239
-
-# Definition of paths
+# Paths
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
@@ -14,6 +12,10 @@ fit_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fi
 fit_coeff_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fit_coeff_poly_{degree}deg_239frames_noframe1.fits'
 residuals_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\residuals_poly_{degree}deg_239frames_noframe1.fits'
 stat_table_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\frame_statistics_poly_{degree}deg_239frames_noframe1.csv'
+rms_table_path = r'F:\leftover_C1_dif_degrees_test_rampfit\rms_of_average.csv'
+slope_table_path = r'F:\leftover_C1_dif_degrees_test_rampfit\slope_of_polynomial.csv'
+
+n_frames = 239
 
 def calculate_residuals(degree):
     y_cube = fits.getdata(y_cube_path)[1:n_frames]  # Load y_cube data
@@ -46,11 +48,7 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
         median_vals.append(np.median(data))  # Calculate median
         std_vals.append(np.std(data))  # Calculate std of residuals
 
-        # For each frame, the slope can be extracted from the slope_coefficients
-        # Assuming you need a single slope value per frame
-        # Here, we are assuming the slope is consistent across the frame.
-        slopes.append((slope_vals))  # Example: average slope across the entire frame
-
+        slopes.append(np.mean(slope_vals))  # Using mean as representative slope
         frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
     table = pd.DataFrame({
@@ -69,12 +67,25 @@ def save_statistics(df, degree):
     length_of_data = len(df)
     divisor = np.sqrt(length_of_data - 1)
     df['TotalRMS Square Sum'] = total_rms_square_sum
-    df['RMS of the Average'] = df['TotalRMS'] / divisor
-    stat_table = stat_table_template.format(degree=degree)
-    df.to_csv(stat_table, index=False)
+    df['RMS of the Average'] = df['TotalRMS Square Sum'] / divisor
+    stat_table_path = stat_table_template.format(degree=degree)
 
-# Process for degrees from 1 to 10
-initial_frame_label = 1124973 #start one later since first frame was cut out
+    # Save the DataFrame to the CSV file
+    df.to_csv(stat_table_path, index=True)
+
+def save_rms_of_average_and_slope_statistics(degree, rms_of_avg, slope):
+    rms_df = pd.DataFrame({'Degree of Fit': [degree], 'RMS of Average': [rms_of_avg]})
+    slope_df = pd.DataFrame({'Degree of Fit': [degree], 'Slope': [slope]})
+
+    # Append to CSV files
+    rms_df.to_csv(rms_table_path, mode='a', header=not pd.io.common.file_exists(rms_table_path), index=False)
+    slope_df.to_csv(slope_table_path, mode='a', header=not pd.io.common.file_exists(slope_table_path), index=False)
+
+# Create or clear the CSV files
+open(rms_table_path, 'w').close()
+open(slope_table_path, 'w').close()
+
+initial_frame_label = 1124973  # start one later since the first frame was cut out
 
 for degree in range(1, 11):
     print(f"Processing degree {degree}")
@@ -83,7 +94,13 @@ for degree in range(1, 11):
     statistics_df = compute_statistics(residuals_cube, fit_coeff, initial_frame_label)  # Compute statistics
     save_statistics(statistics_df, degree)  # Save statistics to CSV
 
-    # Plot histograms for each frame
+    # Compute RMS of the average and slope
+    rms_of_avg = statistics_df['RMS of the Average'].iloc[0]  # RMS of the average for this degree
+    slope = np.mean(fit_coeff[1])  # Mean slope value for this degree
+
+    save_rms_of_average_and_slope_statistics(degree, rms_of_avg, slope)  # Save RMS of average and slope
+
+    # Plot histograms for each frame (optional)
     # for i in range(residuals_cube.shape[0]):
     #     residuals_frame = residuals_cube[i]
     #     mean = statistics_df.loc[i, 'Mean']
