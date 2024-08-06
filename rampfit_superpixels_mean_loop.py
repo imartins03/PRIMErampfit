@@ -23,8 +23,8 @@ supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
 n_frames = 239
 
 
-def calculate_rms(data):
-    return np.sqrt(np.mean(np.square(data)))
+def calculate_rms_square(data):
+    return np.sqrt(np.mean(np.square(data))) ** 2
 
 
 def generate_fit_cube(degrees, centers):
@@ -79,16 +79,21 @@ def generate_fit_cube(degrees, centers):
             residuals = y - fit
             fits.writeto(residuals_filename, residuals, overwrite=True)
 
-            # Calculate average RMS for the residuals over frames
+            # Calculate RMS for each frame
             residuals_cube = fits.getdata(residuals_filename)
-            rms_values = [calculate_rms(frame) for frame in residuals_cube]
-            avg_rms = np.sum(rms_values) / np.sqrt(len(rms_values) - 1)
+            rms_values = [np.sqrt(np.mean(np.square(frame))) for frame in residuals_cube]
+
+            # Calculate squared RMS values and their average
+            rms_square_values = [rms ** 2 for rms in rms_values]
+            sum_squared_rms = np.sum(rms_square_values)
+            rms_of_avg = np.sqrt(sum_squared_rms) / np.sqrt(len(rms_values) - 1)
+
             print(len(rms_values))
 
             avg_rms_data.append({
                 'Degree': degree,
                 'Center': np.flip(center),
-                'RMS of the Average': avg_rms
+                'RMS of the Average': rms_of_avg
             })
 
         # Plot the residuals
@@ -112,7 +117,7 @@ def generate_fit_cube(degrees, centers):
         plt.show()
         plt.close()
 
-    # Create the main results DataFrame (without RMS)
+    # Create the main results DataFrame (with slope)
     results_df = pd.DataFrame({
         'Degree': degree_list,
         'Center': center_list,
@@ -121,22 +126,16 @@ def generate_fit_cube(degrees, centers):
 
     # Save the main results DataFrame to a CSV file
     csv_filename = os.path.join(data_directory, 'results_vs_degree_trial.csv')
-    try:
-        results_df.to_csv(csv_filename, index=True)
-        print(f"Main results saved to {csv_filename}")
-    except Exception as e:
-        print(f"Error saving main results: {e}")
+    results_df.to_csv(csv_filename, index=True)
+    print(f"Main results saved to {csv_filename}")
 
     # Create the average RMS DataFrame
     avg_rms_df = pd.DataFrame(avg_rms_data)
 
     # Save the average RMS DataFrame to a CSV file
     avg_rms_csv_filename = os.path.join(data_directory, 'average_rms_vs_degree_and_center.csv')
-    try:
-        avg_rms_df.to_csv(avg_rms_csv_filename, index=True)
-        print(f"Average RMS results saved to {avg_rms_csv_filename}")
-    except Exception as e:
-        print(f"Error saving average RMS results: {e}")
+    avg_rms_df.to_csv(avg_rms_csv_filename, index=True)
+    print(f"Average RMS results saved to {avg_rms_csv_filename}")
 
     # Print both DataFrames
     print("Main Results DataFrame:")
@@ -148,6 +147,7 @@ def generate_fit_cube(degrees, centers):
     print(f"Results saved to {csv_filename}")
 
     print(results_df)
+
 
 # Parameters
 centers = [(500, 2048), (2048, 2048), (3500, 2048)]  # Centers of the superpixels
