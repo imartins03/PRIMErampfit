@@ -38,8 +38,8 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
     slopes = []  # List to store slope values
     frame_num = []
 
-    # Assuming fit_coeff shape is (2, 4088, 4088) for a first-degree polynomial fit
-    slope_vals = fit_coeff[1]  # Extract the slope layer
+    #fit_coeff shape is (2, 4088, 4088) for a first-degree polynomial fit
+    slope_vals = fit_coeff[-2]  # Extract the slope layer
 
     for i in range(residuals_cube.shape[0]):
         data = residuals_cube[i]
@@ -57,7 +57,7 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
         'RMS': rms_vals,
         'Median': median_vals,
         'StdDev': std_vals,
-        'Slope': slopes,  # Add Slope column
+        'Slope of the Fit': slopes,  # Add Slope column
     })
 
     return table
@@ -67,7 +67,7 @@ def save_statistics(df, degree):
     length_of_data = len(df)
     divisor = np.sqrt(length_of_data - 1)
     df['TotalRMS Square Sum'] = total_rms_square_sum
-    df['RMS of the Average'] = df['TotalRMS Square Sum'] / divisor
+    df['RMS of the Average'] = np.sqrt(df['TotalRMS Square Sum']) / divisor
     stat_table_path = stat_table_template.format(degree=degree)
 
     # Save the DataFrame to the CSV file
@@ -75,7 +75,7 @@ def save_statistics(df, degree):
 
 def save_rms_of_average_and_slope_statistics(degree, rms_of_avg, slope):
     rms_df = pd.DataFrame({'Degree of Fit': [degree], 'RMS of Average': [rms_of_avg]})
-    slope_df = pd.DataFrame({'Degree of Fit': [degree], 'Slope': [slope]})
+    slope_df = pd.DataFrame({'Degree of Fit': [degree], 'Slope of the Fit': [slope]})
 
     # Append to CSV files
     rms_df.to_csv(rms_table_path, mode='a', header=not pd.io.common.file_exists(rms_table_path), index=False)
