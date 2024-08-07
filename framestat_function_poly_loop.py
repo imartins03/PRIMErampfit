@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from astropy.io import fits
 import os
-
+#edit
 # Paths
 y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
 fit_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fit_cube_poly_{degree}deg_239frames_noframe1.fits'
