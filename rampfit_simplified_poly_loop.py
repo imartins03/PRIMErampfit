@@ -50,6 +50,8 @@ def generate_fit_cube(degree, saturation=50000, n_frames=239):
 
     # Reshape coefficients and save
     fit_coeff = coefficients.reshape(degree + 1, 4088, 4088)
+
+
     fit_coeff_path = fit_coeff_path_template.format(degree=degree)
     fits.writeto(fit_coeff_path, fit_coeff, overwrite=True)
 

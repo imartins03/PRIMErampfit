@@ -58,14 +58,12 @@ def generate_fit_cube(degrees, centers):
             coefficients = np.polyfit(time, y, degree)
             fit = np.polyval(coefficients, time)
 
-            # Calculate the slope of the polynomial fit
-            derivative_coefficients = np.polyder(coefficients)
-            slope_at_end = np.polyval(derivative_coefficients, time[-1])
+            slope = coefficients[-2]
 
             # Append results to lists
             degree_list.append(degree)
             center_list.append(np.flip(center))
-            slope_list.append(slope_at_end)  # Store slope of polynomial fit
+            slope_list.append(slope)  # Store slope of polynomial fit
 
             # Create the center_str for file naming
             center_str = f"{center[1]}_{center[0]}"
