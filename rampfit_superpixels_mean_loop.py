@@ -23,23 +23,21 @@ supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
 n_frames = 239
 
 
-def calculate_rms_square(data):
-    return np.sqrt(np.mean(np.square(data))) ** 2
-
-
 def generate_fit_cube(degrees, centers):
+    # Define the base paths for saving files
+    fit_coeff_path = r'fit_coeff_avg_'
+    residuals_base_path = r'residuals_avg_'
+    data_directory = r'D:\NLC\C1\superpix\mean_superpixel'
+
+    # Load data
     y_cube = fits.getdata(y_cube_path)[1:n_frames]
     x, _, y, z = y_cube.shape
     y_cube = y_cube[:, 0, :, :]
 
-    degree_list = []
-    center_list = []
-    slope_list = []
-
+    # Initialize lists and dictionaries for tracking data
+    combined_results_data = []
+    slopes_by_center = {center: [] for center in centers}
     time = np.arange(y_cube.shape[0], dtype=np.double)
-
-    # Create a DataFrame to store average RMS for each superpixel, degree, and center
-    avg_rms_data = []
 
     for degree in degrees:
         for center in centers:
@@ -60,39 +58,38 @@ def generate_fit_cube(degrees, centers):
 
             slope = coefficients[-2]
 
-            # Append results to lists
-            degree_list.append(degree)
-            center_list.append(np.flip(center))
-            slope_list.append(slope)  # Store slope of polynomial fit
-
-            # Create the center_str for file naming
-            center_str = f"{center[1]}_{center[0]}"
-
-            coeff_filename = os.path.join(data_directory,
-                                          f"{fit_coeff_path}center_{center_str}_{degree}deg_{n_frames}frames_noframe1.fits")
-            residuals_filename = os.path.join(data_directory,
-                                              f"{residuals_base_path}center_{center_str}_{degree}deg_{n_frames}frames_noframe1.fits")
-
-            fits.writeto(coeff_filename, coefficients, overwrite=True)
-            residuals = y - fit
-            fits.writeto(residuals_filename, residuals, overwrite=True)
-
             # Calculate RMS for each frame
-            residuals_cube = fits.getdata(residuals_filename)
-            rms_values = [np.sqrt(np.mean(np.square(frame))) for frame in residuals_cube]
+            residuals = y - fit
+            rms_values = [np.sqrt(np.mean(np.square(frame))) for frame in residuals]
 
             # Calculate squared RMS values and their average
             rms_square_values = [rms ** 2 for rms in rms_values]
             sum_squared_rms = np.sum(rms_square_values)
             rms_of_avg = np.sqrt(sum_squared_rms) / np.sqrt(len(rms_values) - 1)
 
-            print(len(rms_values))
-
-            avg_rms_data.append({
+            # Append results to the combined results list
+            combined_results_data.append({
                 'Degree': degree,
                 'Center': np.flip(center),
-                'RMS of the Average': rms_of_avg
+                'RMS of the Average': rms_of_avg,
+                'Slope': slope
             })
+
+            # Track slopes for standard deviation calculation
+            slopes_by_center[tuple(center)].append(slope)
+
+            # Create the center_str for file naming
+            center_str = f"{center[1]}_{center[0]}"
+
+            # Define file paths for coefficients and residuals
+            coeff_filename = os.path.join(data_directory,
+                                          f"{fit_coeff_path}center_{center_str}_{degree}deg_{n_frames}frames_noframe1.fits")
+            residuals_filename = os.path.join(data_directory,
+                                              f"{residuals_base_path}center_{center_str}_{degree}deg_{n_frames}frames_noframe1.fits")
+
+            # Save coefficients and residuals as FITS files
+            fits.writeto(coeff_filename, coefficients, overwrite=True)
+            fits.writeto(residuals_filename, residuals, overwrite=True)
 
         # Plot the residuals
         plt.figure()
@@ -115,39 +112,40 @@ def generate_fit_cube(degrees, centers):
         plt.show()
         plt.close()
 
-    # Create the main results DataFrame (with slope)
-    results_df = pd.DataFrame({
-        'Degree': degree_list,
-        'Center': center_list,
-        'Slope': slope_list
-    })
+    # Create the combined results DataFrame
+    combined_results_df = pd.DataFrame(combined_results_data)
 
-    # Save the main results DataFrame to a CSV file
-    csv_filename = os.path.join(data_directory, 'results_vs_degree_trial.csv')
-    results_df.to_csv(csv_filename, index=True)
-    print(f"Main results saved to {csv_filename}")
+    # Save the combined results DataFrame to a CSV file
+    combined_results_csv_filename = os.path.join(data_directory, 'combined_results.csv')
+    combined_results_df.to_csv(combined_results_csv_filename, index=False)
+    print(f"Combined results saved to {combined_results_csv_filename}")
 
-    # Create the average RMS DataFrame
-    avg_rms_df = pd.DataFrame(avg_rms_data)
-#f
-    # Save the average RMS DataFrame to a CSV file
-    avg_rms_csv_filename = os.path.join(data_directory, 'average_rms_vs_degree_and_center.csv')
-    avg_rms_df.to_csv(avg_rms_csv_filename, index=True)
-    print(f"Average RMS results saved to {avg_rms_csv_filename}")
+    # Calculate the standard deviation of slopes for each center
+    stddev_slope_data = []
+    for center, slopes in slopes_by_center.items():
+        stddev_slope = np.std(slopes)
+
+        stddev_slope_data.append({
+            'Center': np.flip(center),
+            'Standard Deviation of Slope': stddev_slope
+        })
+
+    # Create the standard deviation DataFrame
+    stddev_slope_df = pd.DataFrame(stddev_slope_data)
+
+    # Save the standard deviation DataFrame to a CSV file
+    stddev_slope_csv_filename = os.path.join(data_directory, 'stddev_slope_vs_center.csv')
+    stddev_slope_df.to_csv(stddev_slope_csv_filename, index=False)
+    print(f"Standard deviation of slopes results saved to {stddev_slope_csv_filename}")
 
     # Print both DataFrames
-    print("Main Results DataFrame:")
-    print(results_df)
-    print("Average RMS DataFrame:")
-    print(avg_rms_df)
-
-    results_df.to_csv(csv_filename, index=True)
-    print(f"Results saved to {csv_filename}")
-
-    print(results_df)
+    print("Combined Results DataFrame:")
+    print(combined_results_df)
+    print("Standard Deviation of Slopes DataFrame:")
+    print(stddev_slope_df)
 
 
 # Parameters
 centers = [(500, 2048), (2048, 2048), (3500, 2048)]  # Centers of the superpixels
-degrees = np.linspace(1, 10, 10)
+degrees = np.linspace(1, 10, 10)  # Degrees of polynomial fit
 generate_fit_cube(degrees, centers)
