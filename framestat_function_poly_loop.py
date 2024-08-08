@@ -80,39 +80,42 @@ def save_rms_of_average_and_slope_statistics(degree, rms_of_avg, slope, avg_vari
     # Save RMS and slope to CSV, appending to the file each time
     rms_slope_df.to_csv(rms_slope_variance_table_path, mode='a', header=not os.path.exists(rms_slope_variance_table_path), index=False)
 
-def plot_statistics():
-    # Load the statistics data for plotting
-    df_rms_slope = pd.read_csv(rms_slope_variance_table_path)
+# def plot_statistics():
+#     # Load the statistics data for plotting
+#     df_rms_slope = pd.read_csv(rms_slope_variance_table_path)
+#
+#     # Plot average RMS vs degree of fit
+#     plt.figure()
+#     plt.plot(df_rms_slope['DegreeOfFit'], df_rms_slope['RMSofAverage'], marker='o', linestyle='-')
+#     plt.xlabel('Degree of Fit')
+#     plt.ylabel('Average RMS')
+#     plt.title('Average RMS vs Degree of Fit')
+#     plt.grid(True)
+#     plt.savefig('average_rms_vs_degree.png')
+#     plt.close()
+#
+#     # Plot slope of the fit vs degree of fit
+#     plt.figure()
+#     plt.plot(df_rms_slope['DegreeOfFit'], df_rms_slope['SlopeOfFit'], marker='o', linestyle='-')
+#     plt.xlabel('Degree of Fit')
+#     plt.ylabel('Average Slope')
+#     plt.title('Average Slope vs Degree of Fit')
+#     plt.grid(True)
+#     plt.savefig('average_slope_vs_degree.png')
+#     plt.close()
+#
+# initial_frame_label = 1124973  # start one later since the first frame was cut out
+#
+# total_degrees = 10
+# for degree in range(1, total_degrees + 1):
+#     print(f"Processing degree {degree}/{total_degrees} ({(degree / total_degrees) * 100:.2f}%)")
+#
+#     residuals_cube, fit_cube, fit_coeff = load_data(degree)  # Load data
+#     rms_of_avg, slope, avg_variance = compute_statistics(residuals_cube, fit_coeff, initial_frame_label)  # Compute statistics
+#
+#     save_rms_of_average_and_slope_statistics(degree, rms_of_avg, slope, avg_variance)  # Save RMS of average, slope, and average variance
+#
+# plot_statistics()  # Plot and save the statistics plots
 
-    # Plot average RMS vs degree of fit
-    plt.figure()
-    plt.plot(df_rms_slope['DegreeOfFit'], df_rms_slope['RMSofAverage'], marker='o', linestyle='-')
-    plt.xlabel('Degree of Fit')
-    plt.ylabel('Average RMS')
-    plt.title('Average RMS vs Degree of Fit')
-    plt.grid(True)
-    plt.savefig('average_rms_vs_degree.png')
-    plt.close()
 
-    # Plot slope of the fit vs degree of fit
-    plt.figure()
-    plt.plot(df_rms_slope['DegreeOfFit'], df_rms_slope['SlopeOfFit'], marker='o', linestyle='-')
-    plt.xlabel('Degree of Fit')
-    plt.ylabel('Average Slope')
-    plt.title('Average Slope vs Degree of Fit')
-    plt.grid(True)
-    plt.savefig('average_slope_vs_degree.png')
-    plt.close()
-
-initial_frame_label = 1124973  # start one later since the first frame was cut out
-
-total_degrees = 10
-for degree in range(1, total_degrees + 1):
-    print(f"Processing degree {degree}/{total_degrees} ({(degree / total_degrees) * 100:.2f}%)")
-
-    residuals_cube, fit_cube, fit_coeff = load_data(degree)  # Load data
-    rms_of_avg, slope, avg_variance = compute_statistics(residuals_cube, fit_coeff, initial_frame_label)  # Compute statistics
-
-    save_rms_of_average_and_slope_statistics(degree, rms_of_avg, slope, avg_variance)  # Save RMS of average, slope, and average variance
-
-plot_statistics()  # Plot and save the statistics plots
+#plot in framestat_plot_polt_loop
