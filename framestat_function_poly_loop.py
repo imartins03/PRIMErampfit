@@ -64,8 +64,7 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
     length_of_data = len(rms_vals)
     divisor = np.sqrt(length_of_data - 1)
     rms_of_avg = np.sqrt(total_rms_square_sum) / divisor
-    avg_slope = np.mean(slopes)
-    avg_variance = np.mean(variances)  # Calculate average variance
+    avg_slope = np.mean(slopes)  #this does nothing theyre already averaged...
 
     # Calculate variance and square root of variance for slopes
     slope_variance = np.var(slopes)
