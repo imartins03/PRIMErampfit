@@ -11,7 +11,7 @@ residuals_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_fra
 fit_coeff_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fit_coeff_poly_{degree}deg_239frames_noframe1.fits'
 stat_table_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\frame_statistics_poly_{degree}deg_239frames_noframe1.csv'
 # Updated path for the second table
-rms_slope_variance_table_path = r'F:\leftover_C1_dif_degrees_test_rampfit\rms_slope_variance_statistics.csv'
+rms_slope_variance_table_path = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\rms_slope_variance_statistics.csv'
 
 n_frames = 239
 
@@ -91,10 +91,10 @@ def plot_statistics():
     plt.ylabel('Average RMS')
     plt.title('Average RMS vs Degree of Fit')
     plt.grid(True)
-    plt.show()
-    plt.savefig(r'F:\leftover_C1_dif_degrees_test_rampfit\average_rms_vs_degree.png')
 
-    plt.close()
+    plt.savefig(r'F:\leftover_C1_dif_degrees_test_rampfit\average_rms_vs_degree.png')
+    plt.show()
+
 
     # Plot slope of the fit vs degree of fit
     plt.figure()
@@ -103,10 +103,9 @@ def plot_statistics():
     plt.ylabel('Average Slope')
     plt.title('Average Slope vs Degree of Fit')
     plt.grid(True)
-    plt.show()
-    plt.savefig(r'F:\leftover_C1_dif_degrees_test_rampfit\average_slope_vs_degree.png')
 
-    plt.close()
+    plt.savefig(r'F:\leftover_C1_dif_degrees_test_rampfit\average_slope_vs_degree.png')
+    plt.show()
 
 initial_frame_label = 1124973  # start one later since the first frame was cut out
 
