@@ -102,7 +102,7 @@ def plot_statistics():
     plt.grid(True)
     plt.savefig('average_slope_vs_degree.png')
     plt.close()
-
+#
     # Plot SEM of slope vs degree of fit
     plt.figure()
     plt.plot(df_rms_slope['DegreeOfFit'], df_rms_slope['SlopeSEM'], marker='o', linestyle='-')
