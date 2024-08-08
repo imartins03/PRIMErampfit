@@ -64,7 +64,7 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
     avg_slope = np.mean(slopes)  # Compute the mean slope
 
     # Calculate the standard error of the mean (SEM) for slopes
-    slope_sem = sem(slopes)
+    slope_sem = sem(slope_vals)
 
     return rms_of_avg, avg_slope, slope_sem
 
