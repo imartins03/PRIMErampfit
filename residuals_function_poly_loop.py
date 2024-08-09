@@ -127,3 +127,4 @@ for degree in range(1, total_degrees + 1):
     save_statistics(degree, rms_of_avg, avg_slope, slope_sem)
 
 plot_statistics()
+##
