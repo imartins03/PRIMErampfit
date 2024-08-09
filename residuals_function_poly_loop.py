@@ -75,7 +75,7 @@ def save_statistics(degree, rms_of_avg, avg_slope, slope_sem):
         'RMSofAverage': [rms_of_avg]
     })
     rms_stats_df.to_csv(rms_statistics_table_path, mode='a', header=not os.path.exists(rms_statistics_table_path), index=False)
-
+#
     # Save slope statistics
     slope_stats_df = pd.DataFrame({
         'DegreeOfFit': [degree],
