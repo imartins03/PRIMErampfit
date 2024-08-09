@@ -73,8 +73,8 @@ def save_rms_of_average_and_slope_statistics(degree, rms_of_avg, avg_slope, slop
     rms_slope_df = pd.DataFrame({
         'DegreeOfFit': [degree],
         'RMSofAverage': [rms_of_avg],
-        'SlopeOfFit': [avg_slope],
-        'SlopeSEM': [slope_sem]
+        # 'SlopeOfFit': [avg_slope],
+        # 'SlopeSEM': [slope_sem]
     })
 
     # Save RMS and slope to CSV, appending to the file each time

@@ -20,6 +20,11 @@ mask = maskFile > 0  # Create mask for bad pixels
 supercpy = super_bias.copy()  # Create a copy of the super bias
 supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
 
+
+n_frames = 100
+def weight_func(t):
+    return (50**2)/(50**2 + 306*t)
+
 def evaluate_poly_array(coeffs, a_array, poly_type='power'):
     # Function to evaluate polynomial arrays
     output_arrays = []
@@ -31,7 +36,7 @@ def evaluate_poly_array(coeffs, a_array, poly_type='power'):
             output_arrays.append(output_array)  # Append result to list
     return np.asarray(output_arrays)  # Convert list to numpy array
 
-def generate_fit_cube(degree, saturation=50000, n_frames=239):
+def generate_fit_cube(degree, saturation=50000, n_frames=n_frames):
     y_cube = fits.getdata(y_cube_path)  # Load y_cube data
     x = y_cube.shape[0]  # x is the dimension of the data cube (number of frames)
 
@@ -45,8 +50,9 @@ def generate_fit_cube(degree, saturation=50000, n_frames=239):
 
     time = np.arange(len(y), dtype=np.double)
 
+    weights = weight_func(time+2)
     # Generate array for fitting, time in units of frames
-    coefficients, _ = np.polyfit(time, y, degree, cov=True)  # Fit polynomial
+    coefficients, _ = np.polyfit(time, y, degree, w=weights, cov=True)  # Fit polynomial
 
     # Reshape coefficients and save
     fit_coeff = coefficients.reshape(degree + 1, 4088, 4088)
@@ -62,6 +68,7 @@ def generate_fit_cube(degree, saturation=50000, n_frames=239):
     fits.writeto(fit_cube_path, fit_cube, overwrite=True)
 
     return fit_cube
+
 
 # Loop through polynomial degrees from 1 to 10
 saturation = 50000  # Currently not used
