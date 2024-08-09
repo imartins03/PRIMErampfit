@@ -52,7 +52,7 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
     # frame_stats_df.to_csv(stat_table_template.format(degree=degree), index=False)
 
     # Aggregate statistics
-    rms_of_avg = np.sqrt(np.mean(np.array(rms_vals) ** 2))
+    rms_of_avg = np.sqrt(np.sum(np.array(rms_vals) ** 2))/np.sqrt(len(rms_vals)-1)
     avg_slope = np.mean(np.mean(slope_vals))
     slope_sem = sem(slopes)  # Calculate SEM for the slopes
 
