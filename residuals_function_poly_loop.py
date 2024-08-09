@@ -31,29 +31,29 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
 
     slope_vals = fit_coeff[-2]  # Extract the slope layer
 
-    for i in range(residuals_cube.shape[0]):
-        data = residuals_cube[i]
-        means.append(np.mean(data))
-        rms_vals.append(np.sqrt(np.mean(data ** 2)))
-        median_vals.append(np.median(data))
-        std_vals.append(np.std(data))
-
-        slopes.append(np.mean(slope_vals))  # Store mean slope value for the current frame
-        frame_num.append(initial_frame_label + i)
-
-    # Save frame statistics
-    frame_stats_df = pd.DataFrame({
-        'FrameNumber': frame_num,
-        'Mean': means,
-        'RMS': rms_vals,
-        'Median': median_vals,
-        'StdDev': std_vals
-    })
-    frame_stats_df.to_csv(stat_table_template.format(degree=degree), index=False)
+    # for i in range(residuals_cube.shape[0]):
+    #     data = residuals_cube[i]
+    #     means.append(np.mean(data))
+    #     rms_vals.append(np.sqrt(np.mean(data ** 2)))
+    #     median_vals.append(np.median(data))
+    #     std_vals.append(np.std(data))
+    #
+    #     slopes.append(np.mean(slope_vals))  # Store mean slope value for the current frame
+    #     frame_num.append(initial_frame_label + i)
+    #
+    # # Save frame statistics
+    # frame_stats_df = pd.DataFrame({
+    #     'FrameNumber': frame_num,
+    #     'Mean': means,
+    #     'RMS': rms_vals,
+    #     'Median': median_vals,
+    #     'StdDev': std_vals
+    # })
+    # frame_stats_df.to_csv(stat_table_template.format(degree=degree), index=False)
 
     # Aggregate statistics
     rms_of_avg = np.sqrt(np.mean(np.array(rms_vals) ** 2))
-    avg_slope = np.mean(slopes)
+    avg_slope = np.mean(np.mean(slope_vals))
     slope_sem = sem(slopes)  # Calculate SEM for the slopes
 
     return rms_of_avg, avg_slope, slope_sem
