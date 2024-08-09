@@ -3,15 +3,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-#w
+n_frames = 239
+
 # Definition of paths
 super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
 calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
 maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
 y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
-fit_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fit_cube_poly_{degree}deg_239frames_noframe1.fits'
-fit_coeff_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\fit_coeff_poly_{degree}deg_239frames_noframe1.fits'
-residuals_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\residuals_poly_{degree}deg_239frames_noframe1.fits'
+
+# fit_cube_path_template = r'D:\NLC\C1\dif_degrees_test\100_frames\fit_cube_poly_{degree}deg_{n_frames}frames_noframe1_weights.fits'
+# fit_coeff_path_template = r'D:\NLC\C1\dif_degrees_test\100_frames\fit_coeff_poly_{degree}deg_{n_frames}frames_noframe1_weights.fits'
+# residuals_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\residuals_poly_{degree}deg_239frames_noframe1.fits'
+
+#239 frame paths
+fit_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\weighted\fit_cube_poly_{degree}deg_239frames_noframe1_weights.fits'
+fit_coeff_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\weighted\fit_coeff_poly_{degree}deg_239frames_noframe1_weights.fits'
+residuals_cube_path_template = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\weighted\residuals_poly_{degree}deg_239frames_noframe1_weights.fits'
 
 # Getting data from existing files
 super_bias = fits.getdata(super_bias_path)  # Load super bias data
@@ -20,8 +27,6 @@ mask = maskFile > 0  # Create mask for bad pixels
 supercpy = super_bias.copy()  # Create a copy of the super bias
 supercpy[mask[:, :4096]] = 0  # Apply mask to the super bias copy
 
-
-n_frames = 100
 def weight_func(t):
     return (50**2)/(50**2 + 306*t)
 
@@ -53,18 +58,18 @@ def generate_fit_cube(degree, saturation=50000, n_frames=n_frames):
     weights = weight_func(time+2)
     # Generate array for fitting, time in units of frames
     coefficients, _ = np.polyfit(time, y, degree, w=weights, cov=True)  # Fit polynomial
-
+    # coefficients, _ = np.polyfit(time, y, degree, cov=True)  # Fit polynomial
     # Reshape coefficients and save
     fit_coeff = coefficients.reshape(degree + 1, 4088, 4088)
 
 
-    fit_coeff_path = fit_coeff_path_template.format(degree=degree)
+    fit_coeff_path = fit_coeff_path_template.format(degree=degree,n_frames=n_frames)
     fits.writeto(fit_coeff_path, fit_coeff, overwrite=True)
 
     fit_cube = evaluate_poly_array(np.flip(coefficients, axis=0), time)  # Evaluate polynomial array
 
     fit_cube = fit_cube.reshape(len(time), 4088, 4088)  # Reshape fit cube
-    fit_cube_path = fit_cube_path_template.format(degree=degree)
+    fit_cube_path = fit_cube_path_template.format(degree=degree,n_frames=n_frames)
     fits.writeto(fit_cube_path, fit_cube, overwrite=True)
 
     return fit_cube
@@ -72,6 +77,6 @@ def generate_fit_cube(degree, saturation=50000, n_frames=n_frames):
 
 # Loop through polynomial degrees from 1 to 10
 saturation = 50000  # Currently not used
-for degree in range(1, 11):
+for degree in range(10, 11):
     print(f"Processing degree {degree}")
     generate_fit_cube(degree, saturation)
