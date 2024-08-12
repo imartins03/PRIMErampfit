@@ -40,7 +40,7 @@ def generate_fit_cube(degree, saturation=50000, n_frames=20, num_rows=4):
     print(f"Data shape after slicing and reshaping: {y.shape}")
 
     row_size = y.shape[1] // num_rows  # Calculate size of each row
-    fit_cube = np.zeros((n_frames, 4088, 4088), dtype=np.double)  # Initialize fit cube
+    fit_cube = np.zeros((y_cube.shape[0], 4088, 4088), dtype=np.double)  # Initialize fit cube
 
     output_dir = f'F:/legfit'
     os.makedirs(output_dir, exist_ok=True)  # Create output directory if it doesn't exist
@@ -76,7 +76,6 @@ def generate_fit_cube(degree, saturation=50000, n_frames=20, num_rows=4):
     fit_cube_path = os.path.join(output_dir, f'fit_cube_leg_{degree}deg_final_vst.fits')
     fits.writeto(fit_cube_path, fit_cube, overwrite=True)  # Save final fit cube
     print('Final fit cube shape:', fit_cube.shape)
-
 
 # Loop through degrees from 1 to 10
 for degree in range(1, 11):
