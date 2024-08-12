@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # Define paths
 y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
 
-def calculate_residuals(degree, n_frames=20):
+def calculate_residuals(degree, n_frames=100):
     """Calculate residuals and save statistics for a given Legendre polynomial degree."""
     # Define paths for the current degree
     fit_cube_path = f'F:/legfit/fit_cube_leg_{degree}deg_final_vst.fits'
@@ -14,9 +14,9 @@ def calculate_residuals(degree, n_frames=20):
     stat_table = f'F:/legfit/frame_statistics_leg_{degree}deg.csv'
 
     # Load data
-    y_cube_sliced = fits.getdata(y_cube_path)[:n_frames]  # Load y_cube data
+    y_cube_sliced = fits.getdata(y_cube_path)[1:n_frames]  # Load y_cube data
     y_cube = y_cube_sliced[:, 0, :, :]  # Take out the second dimension
-    fit_cube = fits.getdata(fit_cube_path)[:n_frames]  # Load fit cube data
+    fit_cube = fits.getdata(fit_cube_path)  # Load fit cube data
 
     # Calculate residuals
     residuals_cube = y_cube - fit_cube
