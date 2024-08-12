@@ -55,7 +55,7 @@ slope_table = pd.DataFrame({
     'Degree': degrees,
     'Slope': slopes
 })
-
+#
 # Display the table
 print("Slope vs. Degree Table:")
 print(slope_table)
