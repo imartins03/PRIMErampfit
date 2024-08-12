@@ -5,16 +5,15 @@ import os
 import pandas as pd
 
 # Directory where the data files are stored
-data_directory = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames'
+data_directory = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\weighted'
 
-# Initialize a list to store slopes and degrees
 slopes = []
 degrees = list(range(1, 11))
 
 # Loop over all degrees
 for degree in degrees:
     # Construct the file path for residuals data
-    residuals_cube_path = os.path.join(data_directory, f'residuals_poly_{degree}deg_239frames_noframe1.fits')
+    residuals_cube_path = os.path.join(data_directory, f'residuals_poly_{degree}deg_239frames_noframe1_weights.fits')
 
     # Load the residuals data
     residuals_cube = fits.getdata(residuals_cube_path)
@@ -62,6 +61,6 @@ print("Slope vs. Degree Table:")
 print(slope_table)
 
 # Save table to CSV
-csv_filename = os.path.join(data_directory, 'slope_vs_degree.csv')
+csv_filename = os.path.join(data_directory, 'slope_vs_degree_weighted.csv')
 slope_table.to_csv(csv_filename, index=True)
 print(f"Saved slope vs. degree table to '{csv_filename}'.")
