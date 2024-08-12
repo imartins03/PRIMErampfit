@@ -4,22 +4,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Define paths
-super_bias_path = 'IRRC_calfiles\\super_biasC1.fits.ramp.20231012'
-calFile = r'IRRC_calfiles\irrc_weights_C1.h5'
-maskFile_path = r'IRRC_calfiles\C1_bad_ref_pix_mask.fits'
-y_cube_path = r'D:\NLC\C1\y_cube_100.fits'
+y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
 
-n_frames = 100
-
-
-def calculate_residuals(degree):
+def calculate_residuals(degree, n_frames=20):
+    """Calculate residuals and save statistics for a given Legendre polynomial degree."""
     # Define paths for the current degree
-    fit_cube_path = f'D:\\NLC\\C1\\fit_cube_leg_{degree}deg.fits'
-    residuals_cube_path = f'D:\\NLC\\C1\\residuals_leg_{degree}deg.fits'
-    stat_table = f'D:\\NLC\\C1\\frame_statistics_leg_{degree}deg.csv'
+    fit_cube_path = f'F:/legfit/fit_cube_leg_{degree}deg_final_vst.fits'
+    residuals_cube_path = f'F:/legfit/res_cube_leg_{degree}deg_final_vst.fits'
+    stat_table = f'F:/legfit/frame_statistics_leg_{degree}deg.csv'
 
     # Load data
-    y_cube_sliced = fits.getdata(y_cube_path)[1:n_frames]  # Load y_cube data
+    y_cube_sliced = fits.getdata(y_cube_path)[:n_frames]  # Load y_cube data
     y_cube = y_cube_sliced[:, 0, :, :]  # Take out the second dimension
     fit_cube = fits.getdata(fit_cube_path)[:n_frames]  # Load fit cube data
 
@@ -47,11 +42,10 @@ def calculate_residuals(degree):
         frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
     # Save statistics to CSV
-    table = pd.DataFrame({'Mean': means, 'RMS': rms_vals, 'Median': median_vals, 'StdDev': std_vals})
+    table = pd.DataFrame({'Frame': frame_num, 'Mean': means, 'RMS': rms_vals, 'Median': median_vals, 'StdDev': std_vals})
     table.to_csv(stat_table, index=False)
 
     return residuals_cube
-
 
 # Loop through degrees from 1 to 10
 for degree in range(1, 11):
