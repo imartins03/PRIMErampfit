@@ -26,29 +26,29 @@ for degree in degrees:
         median_value = np.median(frame)
         median_values.append(median_value)
 
-    # Compute the slope of median values
+    # # Compute the slope of median values
     x_values = np.arange(len(median_values))
-    slope, _ = np.polyfit(x_values, median_values, 1)
-
-    # Store the slope for this degree
-    slopes.append(slope)
+    # slope, _ = np.polyfit(x_values, median_values, 1)
+    #
+    # # Store the slope for this degree
+    # slopes.append(slope)
 
     # Plot the median values as a function of frame number
-    # plt.figure()
-    # plt.plot(x_values, median_values, marker='o', linestyle='-', color='black')
-    # plt.title(f'Median of Whole Image ({degree} deg fit) from Center as a Function of Frame Number (poly)')
-    # plt.xlabel('Frame Number (no frame 1)')
-    # plt.ylabel('Median Value of Image')
-    # plt.grid(True)
-    #
+    plt.figure()
+    plt.plot(x_values, median_values, marker='o', linestyle='-', color='black')
+    plt.title(f'Median of Whole Image ({degree} deg fit) from Center as a Function of Frame Number (poly)')
+    plt.xlabel('Frame Number (no frame 1)')
+    plt.ylabel('Median Value of Image')
+    plt.grid(True)
+
     # plt.annotate(f'Slope: {slope:.4f}', xy=(0.95, 0.95), xycoords='axes fraction', fontsize=10,
     #              verticalalignment='top', horizontalalignment='right', color='red')
-    #
-    # # Save the plot
-    # plot_filename = os.path.join(data_directory, f'median_fullim_plot_poly_{degree}deg_noframe1.png')
-    # plt.savefig(plot_filename)
-    # plt.show()
-    # plt.close()  # Close the figure to release memory
+
+    # Save the plot
+    plot_filename = os.path.join(data_directory, f'median_fullim_plot_poly_{degree}deg_noframe1.png')
+    plt.savefig(plot_filename)
+    plt.show()
+    plt.close()  # Close the figure to release memory
 
 # Create a table of slopes vs. degrees
 slope_table = pd.DataFrame({
