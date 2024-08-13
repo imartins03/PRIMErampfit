@@ -19,8 +19,6 @@ def save_coeff_im(degree):
 
         # Check if the array can be reshaped to (degree + 1, 1022, 4088)
         expected_shape = (arr.shape[0], 1022, 4088)
-        if arr.size != np.prod(expected_shape):
-            raise ValueError(f"Array size {arr.size} does not match expected size {np.prod(expected_shape)}")
 
         arr = arr.reshape(expected_shape)
 
