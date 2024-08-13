@@ -11,12 +11,11 @@ y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
 
 def evaluate_legendre_poly(coeffs, x):
     """Evaluate Legendre polynomial with given coefficients."""
-    return np.polynomial.legendre.legval(x, coeffs)
+    return np.transpose(np.polynomial.legendre.legval(x, coeffs))
 
 def save_coefficients(coefficients, degree, row, output_dir):
-    """Save Legendre polynomial coefficients to a .npy file."""
     coeffs_path = os.path.join(output_dir, f'coefficients_degree{degree}_row{row}.fits')
-    np.save(coeffs_path, coefficients)
+    fits.writeto(coeffs_path, coefficients,overwrite=True)
 
 
 def save_fit_cube_row(fit_cube_row, degree, row, output_dir):
