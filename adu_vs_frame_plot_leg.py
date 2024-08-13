@@ -38,6 +38,15 @@ for degree in range(1, 11):
     plt.title(f'Median Residuals ({degree} Degree) as a Function of Frame Number')
     plt.xlabel('Frame Number')
     plt.ylabel('Median Residual Value')
+    plt.xlim(-.5,101)
+
+    if degree <= 2:
+        # Autoscale the plot for the first 2 degrees
+        plt.autoscale()
+    else:
+        # Set fixed limits for the remaining degrees
+        plt.ylim(- 3, 3)
+
     plt.grid(True)
 
     # Save the plot
