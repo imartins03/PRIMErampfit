@@ -15,7 +15,7 @@ def evaluate_legendre_poly(coeffs, x):
 
 def save_coefficients(coefficients, degree, row, output_dir):
     """Save Legendre polynomial coefficients to a .npy file."""
-    coeffs_path = os.path.join(output_dir, f'coefficients_degree{degree}_row{row}.npy')
+    coeffs_path = os.path.join(output_dir, f'coefficients_degree{degree}_row{row}.fits')
     np.save(coeffs_path, coefficients)
 
 
