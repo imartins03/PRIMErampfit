@@ -29,7 +29,7 @@ def reshape_and_save_images(degree):
         row_images.append(reshaped_arr)
 #
         # Save the reshaped image back to disk
-        reshaped_file_path = os.path.join(input_dir, f'coefficients_{degree}_row{row}_unweighted.fits')
+        reshaped_file_path = os.path.join(input_dir, f'coefficients_leg_239frames_{degree}deg_final_vst_unweighted.fits')
         fits.writeto(reshaped_file_path, reshaped_arr, overwrite=True)
         print(f"Saved reshaped .fits file: {reshaped_file_path}")
 
