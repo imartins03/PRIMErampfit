@@ -77,6 +77,6 @@ def generate_fit_cube(degree, saturation=50000, n_frames=n_frames):
 
 # Loop through polynomial degrees from 1 to 10
 saturation = 50000  # Currently not used
-for degree in range(10, 11):
+for degree in range(1, 11):
     print(f"Processing degree {degree}")
     generate_fit_cube(degree, saturation)

@@ -55,9 +55,12 @@ def generate_fit_cube(degree, saturation=50000, n_frames=n_frames, num_rows=4):
 
         time = np.linspace(-1, 1, y_cube.shape[0], dtype=np.double)  # Legendre time
 
-        weights = weight_func(time + 2)
+        # weights = weight_func(time + 2)
+
         # Fit Legendre polynomial
-        coefficients = np.polynomial.legendre.legfit(time, y_row, degree, w=weights)
+        # coefficients = np.polynomial.legendre.legfit(time, y_row, degree, w=weights)
+        #unweighted
+        coefficients = np.polynomial.legendre.legfit(time, y_row, degree)
         print(f'Fitting coefficients for row {i}:', coefficients)
 
         # Save coefficients

@@ -9,9 +9,9 @@ y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
 def calculate_residuals(degree, n_frames=239):
     """Calculate residuals and save statistics for a given Legendre polynomial degree."""
     # Define paths for the current degree
-    fit_cube_path = f'F:/legfit/{n_frames}_frames_weighted/fit_cube_leg_{n_frames}frames_{degree}deg_final_vst_weighted.fits'
-    residuals_cube_path = f'F:/legfit/{n_frames}_frames_weighted/res_cube_leg_{n_frames}frames_{degree}deg_final_vst_weighted.fits'
-    stat_table = f'F:/legfit/{n_frames}_frames_weighted/frame_statistics_leg_{n_frames}frames_{degree}deg_weighted.csv'
+    fit_cube_path = f'F:/legfit/{n_frames}_frames_unweighted/fit_cube_leg_{n_frames}frames_{degree}deg_final_vst_unweighted.fits'
+    residuals_cube_path = f'F:/legfit/{n_frames}_frames_unweighted/res_cube_leg_{n_frames}frames_{degree}deg_final_vst_unweighted.fits'
+    stat_table = f'F:/legfit/{n_frames}_frames_unweighted/frame_statistics_leg_{n_frames}frames_{degree}deg_unweighted.csv'
 
     # Load data
     y_cube_sliced = fits.getdata(y_cube_path)[1:n_frames]  # Load y_cube data
