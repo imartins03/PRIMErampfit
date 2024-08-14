@@ -7,7 +7,7 @@ import os
 input_dir_poly = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\unweighted'
 input_dir_leg = r'F:\legfit\239_frames_unweighted'
 output_dir_residuals = r'F:\legfit\239_frames_unweighted\residuals'
-output_csv = r'F:\legfit\239_frames_unweighted\average_residuals_per_frame.csv'
+output_csv = r'F:\legfit\239_frames_unweighted\average_residuals_per_degree.csv'
 
 # Number of degrees
 num_degrees = 10
@@ -35,42 +35,38 @@ def compute_and_save_residuals(degree):
     print(f"Saved residuals to FITS file: {residual_file}")
 
 
-def compute_average_residuals():
+def compute_average_residuals_per_degree():
     """
-    Compute the average residuals across all degrees.
+    Compute the average residuals for each degree across all frames.
     """
-    residual_files = [os.path.join(output_dir_residuals, f'residuals_degree_{degree}.fits') for degree in
-                      range(1, num_degrees + 1)]
+    average_residuals_per_degree = {}
 
-    residuals_list = []
-    for residual_file in residual_files:
+    for degree in range(1, num_degrees + 1):
+        residual_file = os.path.join(output_dir_residuals, f'residuals_degree_{degree}.fits')
+
+        # Load the residuals
         with fits.open(residual_file) as hdul:
             residuals = hdul[0].data
-        residuals_list.append(residuals)
 
-    # Convert list to a numpy array
-    residuals_array = np.array(residuals_list)  # Shape will be (num_degrees, 293, 1022, 4088)
+        # Compute the average residual for this degree
+        avg_residual = np.mean(residuals)
+        average_residuals_per_degree[degree] = avg_residual
 
-    # Compute average residuals across degrees
-    avg_residuals = np.mean(residuals_array, axis=0)  # Averaging over degrees
-
-    # Compute average residual for each frame
-    avg_residual_per_frame = np.mean(avg_residuals, axis=(1, 2))  # Averaging over (1022, 4088) dimensions
-
-    return avg_residual_per_frame
+    return average_residuals_per_degree
 
 
-def save_residuals_to_csv(avg_residuals):
+def save_residuals_to_csv(avg_residuals_per_degree):
     """
-    Save average residuals to a CSV file.
+    Save average residuals per degree to a CSV file.
     """
     # Create a DataFrame for the CSV file
-    frame_numbers = np.arange(1, len(avg_residuals) + 1)  # Frame numbers start from 1
-    df = pd.DataFrame({'Frame Number': frame_numbers, 'Average Residual': avg_residuals})
+    degrees = list(avg_residuals_per_degree.keys())
+    avg_residuals = list(avg_residuals_per_degree.values())
+    df = pd.DataFrame({'Degree': degrees, 'Average Residual': avg_residuals})
 
     # Save to CSV
     df.to_csv(output_csv, index=False)
-    print(f"Saved residuals to CSV: {output_csv}")
+    print(f"Saved average residuals to CSV: {output_csv}")
 
 
 # Create the output directory for residuals if it does not exist
@@ -80,8 +76,8 @@ os.makedirs(output_dir_residuals, exist_ok=True)
 for degree in range(1, num_degrees + 1):
     compute_and_save_residuals(degree)
 
-# Compute average residuals across all degrees
-avg_residuals = compute_average_residuals()
+# Compute average residuals for each degree
+avg_residuals_per_degree = compute_average_residuals_per_degree()
 
 # Save average residuals to CSV
-save_residuals_to_csv(avg_residuals)
+save_residuals_to_csv(avg_residuals_per_degree)
