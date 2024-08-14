@@ -96,7 +96,7 @@ output_csv = r'F:\legfit\239_frames_unweighted\average_residuals_per_frame_coeff
 # Degree to process
 degree = 1
 
-
+#
 def compute_and_save_residuals_for_first_degree():
     """
     Compute and save residuals between polynomial and Legendre coefficient cubes for the first degree.
