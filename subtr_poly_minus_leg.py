@@ -146,7 +146,7 @@ def save_residuals_to_csv(avg_residuals):
     # Save to CSV
     df.to_csv(output_csv, index=False)
     print(f"Saved average residuals to CSV: {output_csv}")
-
+###
 
 # Create the output directory for residuals if it does not exist
 os.makedirs(output_dir_residuals, exist_ok=True)
