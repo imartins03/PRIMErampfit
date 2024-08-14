@@ -17,15 +17,15 @@ def compute_and_save_residuals_for_first_degree():
     """
     Compute and save residuals for the first degree.
     """
-    # Load coefficient images for the given degree
-    file_poly = os.path.join(input_dir_poly, f'fit_coeff_poly_{degree}deg_239frames_noframe1.fits')
-    file_leg = os.path.join(input_dir_leg, f'coefficients_leg_239frames_{degree}deg_final_vst_unweighted.fits')
+    # Load fit cubes for the given degree
+    file_poly = os.path.join(input_dir_poly, f'fit_cube_poly_{degree}deg_239frames_noframe1.fits')
+    file_leg = os.path.join(input_dir_leg, f'fit_cube_leg_{degree}deg_final_vst_unweighted.fits')
 
-    coeff_poly = fits.getdata(file_poly)
-    coeff_leg = fits.getdata(file_leg)
+    fit_cube_poly = fits.getdata(file_poly)
+    fit_cube_leg = fits.getdata(file_leg)
 
     # Compute the residuals
-    residuals = coeff_poly - coeff_leg
+    residuals = fit_cube_poly - fit_cube_leg
 
     # Define output residual file path
     residual_file = os.path.join(output_dir_residuals, f'residuals_degree_{degree}.fits')
