@@ -9,11 +9,11 @@ y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
 fit_cube_path_template = r"F:\legfit\239_frames_unweighted\fit_cube_leg_239frames_{degree}deg_final_vst_unweighted.fits"
 residuals_cube_path_template = r"F:\legfit\239_frames_unweighted\res_cube_leg_239frames_{degree}deg_final_vst_unweighted.fits"
 fit_coeff_path_template = r"F:\legfit\239_frames_unweighted\coefficients_leg_239frames_{degree}deg_final_vst_unweighted.fits"
-stat_table_template = r'"F:\legfit\239_frames_unweighted\res_stats\frame_statistics_leg_{degree}deg_239frames_noframe1.csv'
+stat_table_template = r'F:\legfit\239_frames_unweighted\res_stats\frame_statistics_leg_{degree}deg_239frames_noframe1.csv'
 # Updated path for the second table
 table_path = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\frame_statistics.csv'
 
-degree = np.arange(1,11)
+degree_range = np.arange(1, 11)
 n_frames = 239
 
 def load_data(degree):
@@ -29,15 +29,10 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
     rms_vals = []
     median_vals = []
     std_vals = []
-    variances = []
-    slopes = []
     frame_num = []
 
-    # fit_coeff shape is (2, 4088, 4088) for a first-degree polynomial fit
-
-
     for i in range(residuals_cube.shape[0]):
-        data = fits.getdata(residuals_cube[i])
+        data = residuals_cube[i]  # Read data directly from the cube
         means.append(np.mean(data))  # Calculate mean
         rms_vals.append(np.sqrt(np.mean(data ** 2)))  # Calculate RMS of residuals
         median_vals.append(np.median(data))  # Calculate median
@@ -56,7 +51,7 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
     # Save statistics to CSV, overwriting the file each time
     frame_stats_df.to_csv(stat_table_template.format(degree=degree), index=False)
 
-    # Compute RMS of average and mean slope
+    # Compute RMS of average
     total_rms_square_sum = np.sum(np.array(rms_vals) ** 2)
     length_of_data = len(rms_vals)
     divisor = np.sqrt(length_of_data - 1)
@@ -84,26 +79,15 @@ def plot_statistics():
     plt.ylabel('Average RMS')
     plt.title('Average RMS vs Degree of Fit')
     plt.grid(True)
-
     plt.savefig(r'F:\leftover_C1_dif_degrees_test_rampfit\average_rms_vs_degree.png')
     plt.show()
 
+initial_frame_label = 1124973  # Start one later since the first frame was cut out
 
-    # Plot slope of the fit vs degree of fit
-    # plt.figure()
-    # plt.plot(df_rms_slope['DegreeOfFit'], df_rms_slope['SlopeOfFit'], marker='o', linestyle='-')
-    # plt.xlabel('Degree of Fit')
-    # plt.ylabel('Average Slope')
-    # plt.title('Average Slope vs Degree of Fit')
-    # plt.grid(True)
-    #
-    # plt.savefig(r'F:\leftover_C1_dif_degrees_test_rampfit\average_slope_vs_degree.png')
-    # plt.show()
+for degree in degree_range:
+    print(f"Processing degree {degree}...")
+    residuals_cube, fit_cube, fit_coeff = load_data(degree)
+    rms_of_avg = compute_statistics(residuals_cube, fit_coeff, initial_frame_label)
+    save_rms_of_average_and_slope_statistics(degree, rms_of_avg)
 
-initial_frame_label = 1124973  # start one later since the first frame was cut out
-
-total_degrees = 10
-
-load_data(degree=degree)
-compute_statistics(residuals_cube, fit_coeff, initial_frame_label)
 plot_statistics()  # Plot and save the statistics plots
