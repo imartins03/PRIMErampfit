@@ -5,7 +5,7 @@ import os
 # Directory containing the .fits files
 input_dir = r'F:\legfit\239_frames_unweighted'
 output_dir = r'F:\legfit\239_frames_unweighted'
-
+#n32
 
 def combine_and_save_coeff_images(degree):
     # Prepare a list to hold the image arrays for each row
