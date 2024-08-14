@@ -5,10 +5,9 @@ import os
 # Directory containing the .fits files
 input_dir = r'F:\legfit\239_frames_unweighted'
 output_dir = r'F:\legfit\239_frames_unweighted'
-#n32
 
-def combine_and_save_coeff_images(degree):
-    # Prepare a list to hold the image arrays for each row
+
+def reshape_and_combine_images(degree):
     row_images = []
 
     # Loop through each row (0 to 3)
@@ -27,11 +26,12 @@ def combine_and_save_coeff_images(degree):
         print(f"Original array shape: {arr.shape}")
         print(f"Original array size: {arr.size}")
 
-        # Append to the list
-        row_images.append(arr)
+        # Reshape the array to (degree + 1, 1022, 4088)
+        reshaped_arr = arr.reshape(degree + 1, 1022, 4088)
+        row_images.append(reshaped_arr)
 
     # Stack along the row axis (axis=1), which is the second dimension
-    combined_image = np.concatenate(row_images, axis=1)
+    combined_image = np.vstack(row_images)
 
     # Check if the combined shape is as expected
     expected_shape = (degree + 1, 4088, 4088)
@@ -45,4 +45,4 @@ def combine_and_save_coeff_images(degree):
 
 # Process files for degrees from 1 to 10
 for degree in range(1, 11):
-    combine_and_save_coeff_images(degree)
+    reshape_and_combine_images(degree)
