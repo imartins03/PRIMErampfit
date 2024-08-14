@@ -27,7 +27,7 @@ def reshape_and_save_images(degree):
         # Reshape the array to (degree + 1, 1022, 4088) if needed
         reshaped_arr = arr.reshape(degree + 1, 1022, 4088)
         row_images.append(reshaped_arr)
-
+#
         # Save the reshaped image back to disk
         reshaped_file_path = os.path.join(input_dir, f'Reshaped_Coefficients_{degree}_row{row}_unweighted.fits')
         fits.writeto(reshaped_file_path, reshaped_arr, overwrite=True)
