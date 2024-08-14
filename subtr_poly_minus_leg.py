@@ -48,11 +48,11 @@ def compute_average_residuals():
             residuals = hdul[0].data
         residuals_list.append(residuals)
 
-    # Stack residuals along the degrees dimension (assuming the first dimension is degrees)
-    stacked_residuals = np.stack(residuals_list, axis=0)
+    # Convert list to a numpy array
+    residuals_array = np.array(residuals_list)  # Shape will be (num_degrees, 293, 1022, 4088)
 
-    # Compute average residuals for each frame
-    avg_residuals = np.mean(stacked_residuals, axis=0)  # Averaging over the degrees dimension
+    # Compute average residuals across degrees
+    avg_residuals = np.mean(residuals_array, axis=0)  # Averaging over degrees
 
     # Compute average residual for each frame
     avg_residual_per_frame = np.mean(avg_residuals, axis=(1, 2))  # Averaging over (1022, 4088) dimensions
@@ -67,7 +67,7 @@ def save_residuals_to_csv(avg_residuals):
     # Create a DataFrame for the CSV file
     frame_numbers = np.arange(1, len(avg_residuals) + 1)  # Frame numbers start from 1
     df = pd.DataFrame({'Frame Number': frame_numbers, 'Average Residual': avg_residuals})
-#
+
     # Save to CSV
     df.to_csv(output_csv, index=False)
     print(f"Saved residuals to CSV: {output_csv}")
