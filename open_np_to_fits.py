@@ -22,8 +22,9 @@ def save_coeff_im(degree):
 
         arr = arr.reshape(expected_shape)
 
+
         # Save as .fits file
-        fits_file = f.replace('.npy', '.fits')
+        fits_file = f'fit_cube_leg_239frames_{degree}deg_final_vst_unweighted'
         fits.writeto(fits_file, arr, overwrite=True)
         print(f"Saved .fits file: {fits_file}")
 
