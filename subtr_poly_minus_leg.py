@@ -67,7 +67,7 @@ def save_residuals_to_csv(avg_residuals):
     # Create a DataFrame for the CSV file
     frame_numbers = np.arange(1, len(avg_residuals) + 1)  # Frame numbers start from 1
     df = pd.DataFrame({'Frame Number': frame_numbers, 'Average Residual': avg_residuals})
-
+#
     # Save to CSV
     df.to_csv(output_csv, index=False)
     print(f"Saved residuals to CSV: {output_csv}")
