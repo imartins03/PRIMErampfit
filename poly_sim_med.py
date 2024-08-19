@@ -25,9 +25,8 @@ def generate_fit_plots(degree, num_points=100):
     y_fit = evaluate_poly_array(np.flip(fit_coeffs, axis=0), x)
 
     # Compute residuals
-    residuals = y_true - y_fit
 
-    # Return residuals
+
     return residuals
 
 # Generate and plot median residuals for polynomial degrees 1 through 10
@@ -38,7 +37,8 @@ for degree in degrees:
     residuals = generate_fit_plots(degree)
     median_residuals.append(np.median(residuals))
 
-plt.figure(figsize=(8, 6))
+
+plt.figure(2, figsize=(8, 6))
 plt.plot(degrees, median_residuals, 'o-', label='Median Residual')
 plt.xlabel('Polynomial Degree')
 plt.ylabel('Median Residual')

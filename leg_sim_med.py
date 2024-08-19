@@ -48,8 +48,8 @@ def evaluate_legendre_poly(coeffs, x):
 def generate_fit_plots(degree, num_points=100):
     """Generate and save plots for a Legendre polynomial fit of a specified degree."""
     # Generate synthetic data
-    # x = np.linspace(-1, 1, num_points)
-    x = np.linspace(1,num_points,num_points)
+    x = np.linspace(-1, 1, num_points)
+    # x = np.linspace(1,num_points,num_points)
     specific_coeffs = np.arange(degree + 1)  # Use coefficients from 0 to degree
 
     y_true = evaluate_poly_array(np.flip(specific_coeffs, axis=0), x)  # Evaluate polynomial array

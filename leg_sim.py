@@ -66,8 +66,13 @@ def generate_fit_plots(degree, num_points=100):
     # Create output directory
     output_dir = f'F:'
 
+    plt.figure(1)
+    plt.plot(x, y_true, label='y_true')
+    plt.plot(x, y_fit, label='y_fit')
+    plt.legend()
+
     # Save plots
     save_plot(x, y_true, y_fit, residuals, degree, output_dir)
 
 # Generate plots for Legendre polynomial of degree 10
-generate_fit_plots(degree=10)
+generate_fit_plots(degree=8)

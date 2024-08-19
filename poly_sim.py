@@ -44,6 +44,8 @@ def save_plot(x, y_true, y_fit, residuals, degree, output_dir):
     plt.close()
 
 
+
+
 def generate_fit_plots(degree, num_points=100):
     """Generate and save plots for a polynomial fit of a specified degree."""
     # Generate synthetic data
@@ -64,9 +66,14 @@ def generate_fit_plots(degree, num_points=100):
     # Create output directory
     output_dir = f'F:'
 
+    plt.figure(1)
+    plt.plot(x, y_true, label='y_true')
+    plt.plot(x, y_fit, label='y_fit')
+    plt.legend()
+
     # Save plots
     save_plot(x, y_true, y_fit, residuals, degree, output_dir)
 
 
 # Generate plots for polynomial of degree 10
-generate_fit_plots(degree=10)
+generate_fit_plots(degree=8)
