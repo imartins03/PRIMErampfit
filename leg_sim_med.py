@@ -49,12 +49,11 @@ def generate_fit_plots(degree, num_points=100):
     """Generate and save plots for a Legendre polynomial fit of a specified degree."""
     # Generate synthetic data
     # x = np.linspace(-1, 1, num_points)
-    x = np.linspace(1,100,num_points)
+    x = np.linspace(1,num_points,num_points)
     specific_coeffs = np.arange(degree + 1)  # Use coefficients from 0 to degree
 
     y_true = evaluate_poly_array(np.flip(specific_coeffs, axis=0), x)  # Evaluate polynomial array
 
-    # Fit polynomial using Legendre basis
     fit_coeffs = np.polynomial.legendre.legfit(x, y_true, degree)
 
     # Evaluate the fitted polynomial
@@ -66,11 +65,15 @@ def generate_fit_plots(degree, num_points=100):
 
     # Save plots
     # save_plot(x, y_true, y_fit, residuals, degree, output_dir)
-    return np.median(residuals)
+    return residuals
 
 # Generate and plot median residuals for polynomial degrees 1 through 10
 degrees = range(1, 11)
-median_residuals = [generate_fit_plots(degree) for degree in degrees]
+median_residuals = []
+
+for degree in degrees:
+    residuals = generate_fit_plots(degree)
+    median_residuals.append(np.median(residuals))
 
 plt.figure(figsize=(8, 6))
 plt.plot(degrees, median_residuals, 'o-', label='Median Residual')
