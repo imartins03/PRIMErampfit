@@ -1,52 +1,73 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+
+def evaluate_poly_array(coeffs, a_array, poly_type='power'):
+    output_arrays = []
+    for a in a_array:
+        if poly_type == 'power':
+            output_array = 0
+            for n, coeff in enumerate(coeffs):
+                output_array += coeff * (a ** n)
+            output_arrays.append(output_array)
+    return np.array(output_arrays)
 
 # Define the polynomial evaluation function for Legendre polynomials
 def evaluate_legendre_poly(coeffs, x):
     """Evaluate Legendre polynomial with given coefficients."""
-    return np.polynomial.legendre.legval(x, coeffs)
+    return np.transpose(np.polynomial.legendre.legval(x, coeffs))
 
-# Define specific polynomial coefficients (e.g., for a 10th-degree polynomial)
-specific_coeffs = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])  # Coefficients in increasing order
+def save_plot(x, y_true, y_fit, residuals, degree, output_dir):
+    """Save plots of true polynomial, fitted polynomial, and residuals."""
+    plt.figure(figsize=(12, 8))
 
-# Parameters
-degree = len(specific_coeffs) - 1
-num_points = 100
+    # Plot true polynomial
+    plt.subplot(3, 1, 1)
+    plt.plot(x, y_true, 'r', label='True Polynomial')
+    plt.title(f'True Polynomial (Degree {degree})')
+    plt.legend()
 
-# Generate synthetic data
-x = np.linspace(0, 10, num_points)  # Change x to a time-like variable ranging from 0 to 10
-y_true = evaluate_legendre_poly(np.flip(specific_coeffs), np.linspace(-1, 1, num_points))  # Generate true data
+    # Plot fitted polynomial
+    plt.subplot(3, 1, 2)
+    plt.plot(x, y_fit, 'g', label='Fitted Polynomial')
+    plt.title(f'Fitted Legendre Poly (Degree {degree})')
+    plt.legend()
 
-# Fit polynomial using Legendre basis
-fit_coeffs = np.polynomial.legendre.legfit(np.linspace(-1, 1, num_points), y_true, degree)
+    # Plot residuals
+    plt.subplot(3, 1, 3)
+    plt.scatter(x, residuals, label='Residuals', color='blue')
+    plt.axhline(0, color='black', linestyle='--')
+    plt.title('Residuals')
 
-# Evaluate the fitted polynomial using `legval`
-y_fit = evaluate_legendre_poly(fit_coeffs, np.interp(x, [0, 10], [-1, 1]))  # Interpolate x to fit the Legendre basis range
+    # Save figure
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f'legendre_fit_degree_{degree}.png'))
+    plt.show()
+    plt.close()
 
-# Compute residuals
-residuals = y_true - y_fit
+def generate_fit_plots(degree, num_points=100):
+    """Generate and save plots for a Legendre polynomial fit of a specified degree."""
+    # Generate synthetic data
+    x = np.linspace(0, 100, num_points+1)
+    # x = np.linspace(-1, 1, num_points)
+    specific_coeffs = np.arange(degree + 1)  # Use coefficients from 0 to degree
 
-# Plot results
-plt.figure(figsize=(12, 8))
+    y_true = evaluate_poly_array(np.flip(specific_coeffs, axis=0), x)  # Evaluate polynomial array
 
-# Plot true polynomial
-plt.subplot(3, 1, 1)
-plt.plot(x, y_true, 'r', label='True Polynomial')
-plt.title('True Polynomial')
-plt.legend()
+    # Fit polynomial using Legendre basis
+    fit_coeffs = np.polynomial.legendre.legfit(x, y_true, degree)
 
-# Plot fitted polynomial
-plt.subplot(3, 1, 2)
-plt.plot(x, y_fit, 'g', label='Fitted Polynomial')
-plt.title('Fitted Polynomial')
-plt.legend()
+    # Evaluate the fitted polynomial
+    y_fit = evaluate_legendre_poly(fit_coeffs, x)
 
-# Plot residuals
-plt.subplot(3, 1, 3)
-plt.scatter(x, residuals, label='Residuals')
-plt.axhline(0, color='black', linestyle='--')
-plt.title('Residuals')
-plt.legend()
+    # Compute residuals
+    residuals = y_true - y_fit
 
-plt.tight_layout()
-plt.show()
+    # Create output directory
+    output_dir = f'F:'
+
+    # Save plots
+    save_plot(x, y_true, y_fit, residuals, degree, output_dir)
+
+# Generate plots for Legendre polynomial of degree 10
+generate_fit_plots(degree=10)
