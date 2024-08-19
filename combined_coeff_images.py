@@ -3,8 +3,8 @@ import numpy as np
 import os
 
 # Directory containing the .fits files
-input_dir = r'F:\legfit\239_frames_unweighted'
-output_dir = r'F:\legfit\239_frames_unweighted'
+input_dir = r'F:\legfit\239_frames_weighted'
+output_dir = r'F:\legfit\239_frames_weighted'
 
 
 def reshape_and_save_images(degree):
@@ -13,7 +13,7 @@ def reshape_and_save_images(degree):
     # Loop through each row (0 to 3)
     for row in range(4):
         # Construct the file name for the given degree and row
-        file_name = f'coefficients_239frames_degree{degree}_row{row}_unweighted.fits'
+        file_name = f'coefficients_239frames_degree{degree}_row{row}_weighted.fits'
         file_path = os.path.join(input_dir, file_name)
 
         # Load the FITS file
@@ -29,7 +29,7 @@ def reshape_and_save_images(degree):
         row_images.append(reshaped_arr)
 #
         # Save the reshaped image back to disk
-        reshaped_file_path = os.path.join(input_dir, f'coefficients_leg_239frames_{degree}deg_final_vst_unweighted.fits')
+        reshaped_file_path = os.path.join(input_dir, f'coefficients_leg_239frames_{degree}deg_final_vst_weighted.fits')
         fits.writeto(reshaped_file_path, reshaped_arr, overwrite=True)
         print(f"Saved reshaped .fits file: {reshaped_file_path}")
 
@@ -41,11 +41,7 @@ def reshape_and_save_images(degree):
     assert combined_image.shape == expected_shape, f"Unexpected shape: {combined_image.shape}, expected: {expected_shape}"
 
     # Save the final combined image
-    final_file_path = os.path.join(output_dir, f'coefficients_leg_239frames_{degree}deg_final_vst_unweighted.fits')
+    final_file_path = os.path.join(output_dir, f'coefficients_leg_239frames_{degree}deg_final_vst_weighted.fits')
     fits.writeto(final_file_path, combined_image, overwrite=True)
     print(f"Saved final .fits file: {final_file_path}")
 
-
-# Process files for degrees from 1 to 10
-for degree in range(1, 11):
-    reshape_and_save_images(degree)

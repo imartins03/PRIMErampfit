@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 
-data_directory = r'D:\NLC\C1\superpix'
+data_directory = r'D:\NLC\C1\superpix\pixel_by_pixel_superpix\100_frames'
 
 superpixel_centers = [(2048, 2048), (3072, 2048), (500, 2048)]  # Add more centers if needed
 median_values_all_deg = []
@@ -17,11 +17,12 @@ for degree in range(1, 11):  # Assuming 10 degrees
     # Loop over all superpixels
     for center in superpixel_centers:
         # Construct the file path for residuals data
-        residuals_cube_path = os.path.join(data_directory, f'residuals_center_{center[1]}_{center[0]}_{degree}deg_noframe1.fits')
+        residuals_cube_path = os.path.join(data_directory, f'residuals_center_{center[1]}_{center[0]}_{degree}.0deg_100frames_noframe1.fits')
+
 
         # Load the data
         y = fits.getdata(residuals_cube_path)
-        center_x, center_y = y.shape[1] // 2, y.shape[2] // 2
+        center_x, center_y = y.shape[0] // 2, y.shape[1] // 2
         superpix_size = 256
         half_size = superpix_size // 2
 
@@ -39,7 +40,7 @@ for degree in range(1, 11):  # Assuming 10 degrees
     plt.figure()
     for center in superpixel_centers:
         plt.plot(np.arange(1, len(median_values_dict[center]) + 1), median_values_dict[center],
-                 marker='o', linestyle='-', label=f'Center {center}')
+                 marker='o', linestyle='-', label=f'Center {np.flip(center)}')
 
     plt.title(f'Median of 256x256 Superpixels ({degree} deg fit) as a Function of Frame Number')
     plt.xlabel('Frame Number')

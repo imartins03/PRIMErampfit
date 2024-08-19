@@ -6,12 +6,12 @@ import os
 
 # Paths
 y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
-fit_cube_path_template = r"F:\legfit\239_frames_unweighted\fit_cube_leg_239frames_{degree}deg_final_vst_unweighted.fits"
-residuals_cube_path_template = r"F:\legfit\239_frames_unweighted\res_cube_leg_239frames_{degree}deg_final_vst_unweighted.fits"
-fit_coeff_path_template = r"F:\legfit\239_frames_unweighted\coefficients_leg_239frames_{degree}deg_final_vst_unweighted.fits"
-stat_table_template = r'F:\legfit\239_frames_unweighted\res_stats\frame_statistics_leg_{degree}deg_239frames_noframe1.csv'
+fit_cube_path_template = r"F:\legfit\239_frames_weighted\fit_cube_leg_239frames_{degree}deg_final_vst_weighted.fits"
+residuals_cube_path_template = r"F:\legfit\239_frames_weighted\res_cube_leg_239frames_{degree}deg_final_vst_weighted.fits"
+fit_coeff_path_template = r"F:\legfit\239_frames_weighted\coefficients_leg_239frames_{degree}deg_final_vst_weighted.fits"
+stat_table_template = r'F:\legfit\239_frames_weighted\res_stats\frame_statistics_leg_{degree}deg_239frames_noframe1.csv'
 # Updated path for the second table
-table_path = r'F:\leftover_C1_dif_degrees_test_rampfit\239_frames\frame_statistics.csv'
+table_path = r'F:\legfit\239_frames_weighted\res_stats\legfit_res_rms_avg_weighted.csv'
 
 degree_range = np.arange(1, 11)
 n_frames = 239
@@ -79,8 +79,7 @@ def plot_statistics():
     plt.ylabel('Average RMS')
     plt.title('Average RMS vs Degree of Fit')
     plt.grid(True)
-    plt.savefig(r'F:\leftover_C1_dif_degrees_test_rampfit\average_rms_vs_degree.png')
-    plt.show()
+    plt.savefig(r'F:\legfit\239_frames_weighted\res_stats\average_rms_vs_degree_legfit_239frames_noframe1_weighted.png')
 
 initial_frame_label = 1124973  # Start one later since the first frame was cut out
 

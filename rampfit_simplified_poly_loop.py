@@ -47,7 +47,7 @@ def generate_fit_cube(degree, saturation=50000, n_frames=n_frames):
 
     y = y_cube.reshape(x, 4088, 4088)
     if n_frames is not None:
-        y = y[1:n_frames, :, :]  # Use specified number of frames
+        y = y[:n_frames, :, :]  # Use specified number of frames
         x = y.shape[0]
 
     y_cube = y
