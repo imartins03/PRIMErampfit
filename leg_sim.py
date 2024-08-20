@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from astropy.io import fits
 
 def evaluate_poly_array(coeffs, a_array, poly_type='power'):
     output_arrays = []
@@ -51,15 +52,24 @@ def save_plot(x, y_true, y_fit, residuals, degree, output_dir):
 
 def generate_fit_plots(degree, num_points=100):
     """Generate and save plots for a Legendre polynomial fit of a specified degree."""
+
+    # Create output directory
+    output_dir = f'F:'
+
     # Generate synthetic data
     x = np.linspace(0, 100, num_points+1)
     # x = np.linspace(-1, 1, num_points)
     specific_coeffs = np.arange(degree + 1)  # Use coefficients from 0 to degree
+    print('true_coeffs', specific_coeffs)
+    fits.writeto(os.path.join(output_dir, f'true_coeffs_degree_{degree}.fits'), specific_coeffs, overwrite=True)
 
     y_true = evaluate_poly_array(np.flip(specific_coeffs, axis=0), x)  # Evaluate polynomial array
 
     # Fit polynomial using Legendre basis
     fit_coeffs = np.polynomial.legendre.legfit(x, y_true, degree)
+    print('fit_coeffs',fit_coeffs)
+    output_dir = r'F:'
+    fits.writeto(os.path.join(output_dir, f'coeff_legsim_degree_{degree}.fits'),np.flip(fit_coeffs), overwrite=True)
 
     # Evaluate the fitted polynomial
     y_fit = evaluate_legendre_poly(fit_coeffs, x)
@@ -67,8 +77,6 @@ def generate_fit_plots(degree, num_points=100):
     # Compute residuals
     residuals = y_true - y_fit
 
-    # Create output directory
-    output_dir = f'F:'
 
     plt.figure(1)
     plt.plot(x, y_true, label='y_true')

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from astropy.io import fits
 
 
 # Define your polynomial evaluation function
@@ -61,6 +62,7 @@ def generate_fit_plots(degree, num_points=100):
 
     # Fit polynomial using np.polyfit
     fit_coeffs = np.polyfit(x, y_true, degree)
+    print(fit_coeffs)
 
 
     # Evaluate the fitted polynomial
@@ -72,6 +74,8 @@ def generate_fit_plots(degree, num_points=100):
     # Create output directory
     output_dir = f'F:'
 
+    fits.writeto(os.path.join(output_dir, f'coeff_polysim_degree_{degree}.fits'), fit_coeffs)
+
     plt.figure(1)
     plt.plot(x, y_true, label='y_true')
     plt.plot(x, y_fit, linestyle='--', label='y_fit')
@@ -79,7 +83,7 @@ def generate_fit_plots(degree, num_points=100):
     plt.ylabel('Polynomial')
     plt.legend()
     plt.title(f'True Polynomial and Polynomial Fit Overlayed (Degree {degree})')
-    plt.savefig(os.path.join(output_dir, f'true_and_fit_degree_{degree}_overlayed.png'))
+    plt.savefig(os.path.join(output_dir, f'true_and_fit_degree_{degree}_overlayed_poly.png'))
 
     # Save plots
     save_plot(x, y_true, y_fit, residuals, degree, output_dir)
