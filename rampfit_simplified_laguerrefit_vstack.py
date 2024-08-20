@@ -16,13 +16,13 @@ def evaluate_leguerre_poly(coeffs, x):
     return np.transpose(np.polynomial.laguerre.lagval(x, coeffs))
 
 def save_coefficients(coefficients, degree, row, output_dir):
-    coeffs_path = os.path.join(output_dir, f'coefficients_{n_frames}frames_degree{degree}_row{row}_unweighted.fits')
+    coeffs_path = os.path.join(output_dir, f'coefficients_lag_{n_frames}frames_degree{degree}_row{row}_unweighted.fits')
     fits.writeto(coeffs_path, coefficients,overwrite=True)
 
 
 def save_fit_cube_row(fit_cube_row, degree, row, output_dir):
     """Save fit cube row to a FITS file."""
-    fit_cube_row_path = os.path.join(output_dir, f'fit_cube_row{row}_{n_frames}frames_degree{degree}_unweighted.fits')
+    fit_cube_row_path = os.path.join(output_dir, f'fit_cube_lag_row{row}_{n_frames}frames_degree{degree}_unweighted.fits')
     fits.writeto(fit_cube_row_path, fit_cube_row, overwrite=True)
 
 
@@ -78,7 +78,7 @@ def generate_fit_cube(degree, saturation=50000, n_frames=n_frames, num_rows=4):
         print(f'Fit cube shape for row {i}:', fit_cube_row.shape)
 
     # Save final stacked fit cube
-    fit_cube_path = os.path.join(output_dir, f'fit_cube_leg_{n_frames}frames_{degree}deg_final_vst_unweighted.fits')
+    fit_cube_path = os.path.join(output_dir, f'fit_cube_lag_{n_frames}frames_{degree}deg_final_vst_unweighted.fits')
     fits.writeto(fit_cube_path, fit_cube, overwrite=True)  # Save final fit cube
     print('Final fit cube shape:', fit_cube.shape)
 

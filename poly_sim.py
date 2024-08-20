@@ -23,18 +23,24 @@ def save_plot(x, y_true, y_fit, residuals, degree, output_dir):
     plt.subplot(3, 1, 1)
     plt.plot(x, y_true, 'r', label='True Polynomial')
     plt.title(f'True Polynomial (Degree {degree})')
+    plt.ylabel('Residuals')
+    plt.xlabel('Time/x values')
     plt.legend()
 
     # Plot fitted polynomial
     plt.subplot(3, 1, 2)
     plt.plot(x, y_fit, 'g', label='Fitted Polynomial')
     plt.title(f'Fitted Polynomial (Degree {degree})')
+    plt.ylabel('Residuals')
+    plt.xlabel('Time/x values')
     plt.legend()
 
     # Plot residuals
     plt.subplot(3, 1, 3)
     plt.scatter(x, residuals, label='Residuals', color='blue')
     plt.axhline(0, color='black', linestyle='--')
+    plt.ylabel('Residuals')
+    plt.xlabel('Time/x values')
     plt.title('Residuals')
 
     # Save figure
@@ -68,8 +74,12 @@ def generate_fit_plots(degree, num_points=100):
 
     plt.figure(1)
     plt.plot(x, y_true, label='y_true')
-    plt.plot(x, y_fit, label='y_fit')
+    plt.plot(x, y_fit, linestyle='--', label='y_fit')
+    plt.xlabel('Time/x values')
+    plt.ylabel('Polynomial')
     plt.legend()
+    plt.title(f'True Polynomial and Polynomial Fit Overlayed (Degree {degree})')
+    plt.savefig(os.path.join(output_dir, f'true_and_fit_degree_{degree}_overlayed.png'))
 
     # Save plots
     save_plot(x, y_true, y_fit, residuals, degree, output_dir)

@@ -25,7 +25,7 @@ def generate_fit_plots(degree, num_points=100):
     y_fit = evaluate_poly_array(np.flip(fit_coeffs, axis=0), x)
 
     # Compute residuals
-
+    residuals = y_true - y_fit
 
     return residuals
 
@@ -42,7 +42,7 @@ plt.figure(2, figsize=(8, 6))
 plt.plot(degrees, median_residuals, 'o-', label='Median Residual')
 plt.xlabel('Polynomial Degree')
 plt.ylabel('Median Residual')
-plt.title('Median Residual vs Polynomial Degree')
+plt.title('Median Residual vs Polynomial Degree, Polyfit')
 plt.legend()
 plt.grid(True)
 plt.savefig(r'F:\median_residuals_poly.png')  # Use raw string for Windows path
