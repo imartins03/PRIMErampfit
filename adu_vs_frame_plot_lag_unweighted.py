@@ -6,7 +6,7 @@ import os
 
 n_frames=239
 # Directory where the data files are stored
-data_directory = f'F:\legfit\{n_frames}_frames_unweighted'
+data_directory = f'F:\laguerrefit\{n_frames}_frames_unweighted'
 
 # Initialize a list to store median residual values for each degree
 median_residuals_all_deg = []
@@ -15,7 +15,7 @@ median_residuals_all_deg = []
 for degree in range(1, 11):
 
     # Construct file paths
-    residuals_cube_path = os.path.join(data_directory, f'res_cube_leg_{n_frames}frames_{degree}deg_final_vst_unweighted.fits')
+    residuals_cube_path = os.path.join(data_directory, f'res_cube_lag_{n_frames}frames_{degree}deg_final_vst_unweighted.fits')
 
     # Load the residuals data
     residuals_cube = fits.getdata(residuals_cube_path)
@@ -43,7 +43,7 @@ for degree in range(1, 11):
     plt.grid(True)
 
     # Save the plot
-    plot_filename = os.path.join(data_directory, f'median_residuals_plot_leg_{n_frames}frames_{degree}deg_unweighted.png')
+    plot_filename = os.path.join(data_directory, f'median_residuals_plot_lag_{n_frames}frames_{degree}deg_unweighted.png')
     plt.savefig(plot_filename)
     # plt.show()
     plt.close()  # Close the figure to release memory

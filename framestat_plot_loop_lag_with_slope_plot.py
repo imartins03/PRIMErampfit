@@ -6,12 +6,12 @@ import os
 
 # Paths
 y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
-fit_cube_path_template = r"F:\legfit\239_frames_unweighted\final_coefficient_and_fit_images\fit_cube_leg_239frames_{degree}deg_final_vst_unweighted.fits"
-residuals_cube_path_template = r"F:\legfit\239_frames_unweighted\residuals\residuals_degree_{degree}.fits"
-fit_coeff_path_template = r"F:\legfit\239_frames_unweighted\final_coefficient_and_fit_images\coefficients_leg_239frames_{degree}deg_final_vst_unweighted.fits"
-stat_table_template = r'F:\legfit\239_frames_unweighted\res_stats\frame_statistics_leg_{degree}deg_239frames_noframe1.csv'
+fit_cube_path_template = r"F:\laguerrefit\239_frames_unweighted\fit_cube_lag_239frames_{degree}deg_final_vst_unweighted.fits"
+residuals_cube_path_template = r"F:\laguerrefit\239_frames_unweighted\res_cube_lag_239frames_{degree}deg_final_vst_unweighted.fits"
+fit_coeff_path_template = r"F:\laguerrefit\239_frames_unweighted\coefficients_lag_239frames_{degree}deg_final_vst_unweighted.fits"
+stat_table_template = r'F:\laguerrefit\239_frames_unweighted\frame_statistics_lag_{degree}deg_239frames_noframe1.csv'
 # Updated path for the second table
-table_path = r'F:\legfit\239_frames_unweighted\res_stats\legfit_res_slope_unweighted.csv'
+table_path = r'F:\laguerrefit\239_frames_unweighted\lagfit_res_slope_unweighted.csv'
 
 degree_range = np.arange(1, 11)
 n_frames = 239
@@ -32,7 +32,7 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
     frame_num = []
     slopes = []
 
-    slope_vals = fit_coeff[-2]  # Extract the slope layer
+    # slope_vals = fit_coeff[-2]  # Extract the slope layer
 
     for i in range(residuals_cube.shape[0]):
         data = residuals_cube[i]  # Read data directly from the cube
@@ -40,7 +40,7 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
         rms_vals.append(np.sqrt(np.mean(data ** 2)))  # Calculate RMS of residuals
         median_vals.append(np.median(data))  # Calculate median
         std_vals.append(np.std(data))  # Calculate std of residuals
-        slopes.append(np.mean(slope_vals))  # Using mean as representative slope
+        # slopes.append(np.mean(slope_vals))  # Using mean as representative slope
         frame_num.append(initial_frame_label + i)  # Adjusted frame numbering
 
     # Save statistics for frames
@@ -63,11 +63,10 @@ def compute_statistics(residuals_cube, fit_coeff, initial_frame_label):
 
     return rms_of_avg
 
-def save_rms_of_average_and_slope_statistics(degree, rms_of_avg,slopes):
+def save_rms_of_average_and_slope_statistics(degree, rms_of_avg):
     rms_slope_df = pd.DataFrame({
         'DegreeOfFit': [degree],
         'RMSofAverage': [rms_of_avg],
-        'SlopeofFit': [slopes]
     })
 
     # Save RMS and slope to CSV, appending to the file each time
@@ -84,16 +83,16 @@ def plot_statistics():
     plt.ylabel('Average RMS')
     plt.title('Average RMS vs Degree of Fit')
     plt.grid(True)
-    plt.savefig(r'F:\legfit\239_frames_unweighted\res_stats\average_rms_vs_degree_legfit_239frames_noframe1_unweighted.png')
+    plt.savefig(r'F:\laguerrefit\239_frames_unweighted\res_stats\average_rms_vs_degree_lagfit_239frames_noframe1_unweighted.png')
 
-    # Plot average RMS vs degree of fit
-    plt.figure(2)
-    plt.plot(df_rms_slope['DegreeOfFit'], df_rms_slope['SlopeofFit'], marker='o', linestyle='-')
-    plt.xlabel('Degree of Fit')
-    plt.ylabel('SlopeofFit')
-    plt.title('Slope of Fit vs Degree of Fit')
-    plt.grid(True)
-    plt.savefig(r'F:\legfit\239_frames_unweighted\res_stats\slope_of_the_fit_vs_degree_legfit_239_frames_noframe1_unweighted.png')
+    # # Plot average RMS vs degree of fit
+    # plt.figure(2)
+    # plt.plot(df_rms_slope['DegreeOfFit'], df_rms_slope['SlopeofFit'], marker='o', linestyle='-')
+    # plt.xlabel('Degree of Fit')
+    # plt.ylabel('SlopeofFit')
+    # plt.title('Slope of Fit vs Degree of Fit')
+    # plt.grid(True)
+    # plt.savefig(r'F:\laguerrefit\239_frames_unweighted\res_stats\slope_of_the_fit_vs_degree_lagfit_239_frames_noframe1_unweighted.png')
 
 initial_frame_label = 1124973  # Start one later since the first frame was cut out
 
@@ -101,6 +100,6 @@ for degree in degree_range:
     print(f"Processing degree {degree}...")
     residuals_cube, fit_cube, fit_coeff = load_data(degree)
     rms_of_avg = compute_statistics(residuals_cube, fit_coeff, initial_frame_label)
-    save_rms_of_average_and_slope_statistics(degree, rms_of_avg,fit_coeff[-2])
+    save_rms_of_average_and_slope_statistics(degree, rms_of_avg)
 
 plot_statistics()  # Plot and save the statistics plots
