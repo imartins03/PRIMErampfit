@@ -13,7 +13,7 @@ median_residuals_all_deg = []
 
 # Loop over degrees from 1 to 10
 for degree in range(1, 11):
-
+#
     # Construct file paths
     residuals_cube_path = os.path.join(data_directory, f'res_cube_lag_{n_frames}frames_{degree}deg_final_vst_unweighted.fits')
 
