@@ -100,8 +100,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # File path
-y_cube_path = r'D:\NLC\C1\y_cube_500.fits'
-
+y_cube_path = r"G:\20240820.rimas.0010-0109.HK.mean.fits"
+n_frames = 22
 def compute_statistics(y_cube_path, initial_frame_label):
     means = []
     frame_num = []
@@ -117,19 +117,22 @@ def compute_statistics(y_cube_path, initial_frame_label):
     return means
 
 # Initial frame label for the processing
-initial_frame_label = 1124972
+initial_frame_label = 1
 
 # Compute statistics
 average_adus = compute_statistics(y_cube_path, initial_frame_label)
+coeffs = np.polyfit(np.arange(n_frames),average_adus, 1)
+line_vals = np.polyval(coeffs, np.arange(n_frames))
 
 # Plot the average ADU value as a function of frame number
 plt.figure(figsize=(10, 6))
-plt.plot(np.arange(len(average_adus)), average_adus, marker='o', linestyle='-')
+plt.plot(np.arange(len(average_adus)), average_adus, 'o')
+plt.plot(np.arange(len(average_adus)), line_vals)
 plt.xlabel('Frame Number')
 plt.ylabel('Average ADU Value')
 plt.title('Average ADU Value per Frame')
 plt.grid(True)
-plt.savefig(r'D:\NLC\C1\average_adu_per_frame.png')  # Save the plot as an image file
+plt.savefig(r'G:\average_adu_per_frame.png')  # Save the plot as an image file
 plt.show()
 
 saturation_val = 50000
@@ -137,25 +140,25 @@ y_cube = fits.getdata(y_cube_path)
 print(y_cube.shape)
 y = y_cube[:,0,:,:]
 
-def percentage_saturation_val():
-    percentages = []
-
-    for i in range(y.shape[0]):
-        frame_data = y[i]
-
-        pix_over_saturation = np.sum(frame_data > saturation_val)
-
-        # Calculate the total number of pixels
-        total_pixels = 4088*4088
-
-        # Calculate the percentage of saturated pixels
-        percentage_pix_over_saturation = (pix_over_saturation/total_pixels)*100
-        percentages.append(percentage_pix_over_saturation)
-        print(f"Frame {i}: {percentage_pix_over_saturation:.2f}%")
-
-    return percentages
-
-percentages = percentage_saturation_val()
+# def percentage_saturation_val():
+#     percentages = []
+#
+#     for i in range(y.shape[0]):
+#         frame_data = y[i]
+#
+#         pix_over_saturation = np.sum(frame_data > saturation_val)
+#
+#         # Calculate the total number of pixels
+#         total_pixels = 4088*4088
+#
+#         # Calculate the percentage of saturated pixels
+#         percentage_pix_over_saturation = (pix_over_saturation/total_pixels)*100
+#         percentages.append(percentage_pix_over_saturation)
+#         print(f"Frame {i}: {percentage_pix_over_saturation:.2f}%")
+#
+#     return percentages
+#
+# percentages = percentage_saturation_val()
 
 
 
